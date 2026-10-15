@@ -1,0 +1,265 @@
+﻿@page "/zeiterfassung"
+
+@using Radzen
+@using Radzen.Blazor
+
+<PageTitle>Zeiterfassung</PageTitle>
+
+<div class="container-fluid py-4">
+
+    @* Seitenüberschrift *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <RadzenText Text="Zeiterfassung"
+                        TextStyle="TextStyle.H4" />
+
+            <RadzenText Text="Behalte deine Arbeitszeit im Überblick."
+                        TextStyle="TextStyle.Body2" />
+        </div>
+
+        <RadzenButton Text="Aktualisieren"
+                      Icon="refresh"
+                      ButtonStyle="ButtonStyle.Light"
+                      Click="@RefreshData" />
+    </div>
+
+
+    @* Übersichtskarten *@
+    <RadzenRow Gap="16px">
+
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenCard>
+                <RadzenText Text="Heute"
+                            TextStyle="TextStyle.Subtitle2" />
+
+                <RadzenText Text="@TodayHours"
+                            TextStyle="TextStyle.H4" />
+
+                <RadzenText Text="Bisher erfasste Arbeitszeit"
+                            TextStyle="TextStyle.Caption" />
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenCard>
+                <RadzenText Text="Diese Woche"
+                            TextStyle="TextStyle.Subtitle2" />
+
+                <RadzenText Text="@WeekHours"
+                            TextStyle="TextStyle.H4" />
+
+                <RadzenText Text="Gesamte Wochenarbeitszeit"
+                            TextStyle="TextStyle.Caption" />
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenCard>
+                <RadzenText Text="Aktueller Status"
+                            TextStyle="TextStyle.Subtitle2" />
+
+                <RadzenText Text="@WorkStatus"
+                            TextStyle="TextStyle.H4" />
+
+                <RadzenText Text="@StatusDescription"
+                            TextStyle="TextStyle.Caption" />
+            </RadzenCard>
+        </RadzenColumn>
+
+    </RadzenRow>
+
+
+    @* Arbeitszeit starten und beenden *@
+    <RadzenCard class="mt-4">
+
+        <RadzenText Text="Arbeitszeiterfassung"
+                    TextStyle="TextStyle.H5" />
+
+        <RadzenText Text="@CurrentDate"
+                    TextStyle="TextStyle.Body2" />
+
+        <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
+
+            <div>
+                <RadzenText Text="Arbeitsbeginn"
+                            TextStyle="TextStyle.Caption" />
+
+                <RadzenText Text="@StartTime"
+                            TextStyle="TextStyle.H5" />
+            </div>
+
+            <div>
+                <RadzenText Text="Arbeitsende"
+                            TextStyle="TextStyle.Caption" />
+
+                <RadzenText Text="@EndTime"
+                            TextStyle="TextStyle.H5" />
+            </div>
+
+            <div class="ms-md-auto">
+                @if (!IsWorking)
+                {
+                    <RadzenButton Text="Einstempeln"
+                                  Icon="play_arrow"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Click="@StartWork" />
+                }
+                else
+                {
+                    <RadzenButton Text="Ausstempeln"
+                                  Icon="stop"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Click="@StopWork" />
+                }
+            </div>
+
+        </div>
+
+    </RadzenCard>
+
+
+    @* Zeiteinträge *@
+    <RadzenCard class="mt-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <RadzenText Text="Meine Zeiteinträge"
+                        TextStyle="TextStyle.H5" />
+
+            <RadzenDatePicker @bind-Value="SelectedDate"
+                              DateFormat="dd.MM.yyyy"
+                              Placeholder="Datum auswählen" />
+        </div>
+
+        <RadzenDataGrid Data="@Entries"
+                        TItem="TimeEntry"
+                        AllowPaging="true"
+                        PageSize="5"
+                        AllowSorting="true"
+                        EmptyText="Keine Zeiteinträge vorhanden.">
+
+            <Columns>
+
+                <RadzenDataGridColumn TItem="TimeEntry"
+                                      Property="Date"
+                                      Title="Datum"
+                                      FormatString="{0:dd.MM.yyyy}" />
+
+                <RadzenDataGridColumn TItem="TimeEntry"
+                                      Property="Start"
+                                      Title="Beginn" />
+
+                <RadzenDataGridColumn TItem="TimeEntry"
+                                      Property="End"
+                                      Title="Ende" />
+
+                <RadzenDataGridColumn TItem="TimeEntry"
+                                      Property="Duration"
+                                      Title="Arbeitszeit" />
+
+                <RadzenDataGridColumn TItem="TimeEntry"
+                                      Title="Aktionen"
+                                      Sortable="false"
+                                      Filterable="false">
+
+                    <Template Context="entry">
+                        <RadzenButton Icon="delete"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Variant="Variant.Text"
+                                      Size="ButtonSize.Small"
+                                      Click="@(() => DeleteEntry(entry))" />
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+            </Columns>
+
+        </RadzenDataGrid>
+
+    </RadzenCard>
+
+</div>
+
+
+@code {
+    private bool IsWorking = false;
+
+    private string StartTime = "--:--";
+    private string EndTime = "--:--";
+
+    private DateTime SelectedDate = DateTime.Today;
+
+    private string TodayHours = "4 Std. 03 Min.";
+    private string WeekHours = "12 Std. 33 Min.";
+
+    private string WorkStatus =>
+        IsWorking ? "Aktiv" : "Nicht aktiv";
+
+    private string StatusDescription =>
+        IsWorking
+            ? "Deine Arbeitszeit läuft."
+            : "Noch keine aktive Buchung.";
+
+    private string CurrentDate =>
+        DateTime.Today.ToString("dddd, dd. MMMM yyyy");
+
+    private List<TimeEntry> Entries = new()
+    {
+        new TimeEntry
+        {
+            Date = DateTime.Today,
+            Start = "08:00",
+            End = "12:00",
+            Duration = "4 Std."
+        },
+
+        new TimeEntry
+        {
+            Date = DateTime.Today.AddDays(-1),
+            Start = "08:15",
+            End = "16:30",
+            Duration = "8 Std. 15 Min."
+        },
+
+        new TimeEntry
+        {
+            Date = DateTime.Today.AddDays(-2),
+            Start = "09:00",
+            End = "17:00",
+            Duration = "8 Std."
+        }
+    };
+
+    private void StartWork()
+    {
+        IsWorking = true;
+        StartTime = DateTime.Now.ToString("HH:mm");
+        EndTime = "--:--";
+    }
+
+    private void StopWork()
+    {
+        IsWorking = false;
+        EndTime = DateTime.Now.ToString("HH:mm");
+    }
+
+    private void DeleteEntry(TimeEntry entry)
+    {
+        Entries.Remove(entry);
+    }
+
+    private void RefreshData()
+    {
+        StateHasChanged();
+    }
+
+    public class TimeEntry
+    {
+        public DateTime Date { get; set; }
+
+        public string Start { get; set; } = "";
+
+        public string End { get; set; } = "";
+
+        public string Duration { get; set; } = "";
+    }
+}
