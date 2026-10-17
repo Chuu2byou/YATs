@@ -1,3 +1,4 @@
+using Radzen;
 using Microsoft.EntityFrameworkCore;
 using Yet_Another_Timesaver.Backend;
 using Yet_Another_Timesaver.Components;
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddRadzenComponents();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
