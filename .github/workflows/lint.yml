@@ -1,0 +1,29 @@
+name: Lint (dotnet format)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: 10.0.x
+  PROJECT_PATH: Yet Another Timesaver/Yet Another Timesaver.csproj
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore "${{ env.PROJECT_PATH }}"
+
+      - name: Check formatting
+        run: dotnet format "${{ env.PROJECT_PATH }}" --verify-no-changes --verbosity diagnostic
