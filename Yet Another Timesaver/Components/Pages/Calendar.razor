@@ -1,11 +1,12 @@
 @page "/calendar"
+@rendermode InteractiveServer
 @inject DialogService DialogService
 
 <RadzenScheduler @ref=@scheduler AllowDateSelection="true" SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End" ShowHeader=@showHeader
-                 TextProperty="Text" SelectedIndex="2"
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender DaySelect="@OnDaySelect"
-    AppointmentMove=@OnAppointmentMove AppointmentResize=@OnAppointmentResize >
+                 TextProperty="Text" SelectedIndex="2" ShowDateTitle="true"
+                 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender DaySelect="@OnDaySelect"
+                 AppointmentMove=@OnAppointmentMove AppointmentResize=@OnAppointmentResize LoadData="OnInitialized">
     <RadzenDayView />
     <RadzenWeekView />
-    <RadzenMonthView />
+    <RadzenMonthView  />
 </RadzenScheduler>

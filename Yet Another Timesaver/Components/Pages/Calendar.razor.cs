@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Components;
 using Radzen;
 using Radzen.Blazor;
 
-
 namespace Yet_Another_Timesaver.Components.Pages;
 
 public partial class Calendar : ComponentBase
 {
-    RadzenScheduler<Appointment> scheduler;
-    EventConsole console;
+   RadzenScheduler<Appointment> scheduler;
+   EventConsole console;
+   Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     bool showHeader = true;
 
@@ -25,9 +25,11 @@ public partial class Calendar : ComponentBase
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
 
+
+
     void OnDaySelect(SchedulerDaySelectEventArgs args)
     {
-        console.Log($"DaySelect: Day={args.Day} AppointmentCount={args.Appointments.Count()}");
+        console.Log($"DaySelect: Day={args.Day} AppointmentCount={args.Appointments?.Count() ?? 0}");
     }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
@@ -49,7 +51,7 @@ public partial class Calendar : ComponentBase
     {
         console.Log($"SlotSelect: Start={args.Start} End={args.End}");
 
-        if (args.View.Text != "Year")
+        if (args.View?.Text != "Year")
         {
             Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
                 new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
@@ -65,7 +67,7 @@ public partial class Calendar : ComponentBase
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
-        console.Log($"AppointmentSelect: Appointment={args.Data.Text}");
+        console.Log($"AppointmentSelect: Appointment={args.Data?.Text}");
 
         var copy = new Appointment
         {
