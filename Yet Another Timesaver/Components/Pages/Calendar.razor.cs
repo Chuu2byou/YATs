@@ -7,7 +7,9 @@ namespace Yet_Another_Timesaver.Components.Pages;
 public partial class Calendar : ComponentBase
 {
    RadzenScheduler<Appointment> scheduler;
+
    EventConsole console;
+
    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     bool showHeader = true;
