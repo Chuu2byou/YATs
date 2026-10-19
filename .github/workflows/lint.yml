@@ -15,10 +15,10 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -33,26 +33,28 @@ jobs:
           status=$?
           if [ "$status" -ne 0 ]; then
             prefix="${GITHUB_WORKSPACE:-$PWD}/$(dirname "${{ env.PROJECT_PATH }}")/"
-            {
-              echo "### ⚠️ dotnet format fehlgeschlagen"
-              echo ""
-              echo "| Datei : Zeile | Regel | Beschreibung |"
-              echo "| :--- | :--- | :--- |"
-              matched=0
-              while IFS= read -r line; do
-                if [[ "$line" =~ ^(.*)\(([0-9]+),[0-9]+\):\ error\ ([A-Za-z0-9_]+):\ (.*)\ \[.*\]$ ]]; then
-                  matched=1
-                  file="${BASH_REMATCH[1]#"$prefix"}"
-                  printf '| `%s:%s` | `%s` | %s |\n' "$file" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
-                fi
-              done <<< "$output"
 
-              if [ "$matched" -eq 0 ]; then
-                echo ""
-                echo '```text'
-                echo "$output"
-                echo '```'
+            body="### ⚠️ dotnet format fehlgeschlagen"$'\n\n'
+            body+="| Datei : Zeile | Regel | Beschreibung |"$'\n'
+            body+="| :--- | :--- | :--- |"$'\n'
+            annotations=""
+            matched=0
+            while IFS= read -r line; do
+              if [[ "$line" =~ ^(.*)\(([0-9]+),[0-9]+\):\ error\ ([A-Za-z0-9_]+):\ (.*)\ \[.*\]$ ]]; then
+                matched=1
+                path="${BASH_REMATCH[1]}"
+                file="${path#"$prefix"}"
+                body+=$(printf '| `%s:%s` | `%s` | %s |' "$file" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}")$'\n'
+                annotations+=$(printf '::error file=%s,line=%s::%s (%s)' "$path" "${BASH_REMATCH[2]}" "${BASH_REMATCH[4]}" "${BASH_REMATCH[3]}")$'\n'
               fi
-            } >> "$GITHUB_STEP_SUMMARY"
+            done <<< "$output"
+
+            if [ "$matched" -eq 0 ]; then
+              body+=$'\n```text\n'"$output"$'\n```\n'
+            fi
+
+            printf '%s\n' "$body"
+            printf '%s\n' "$annotations"
+            printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
           fi
           exit "$status"
