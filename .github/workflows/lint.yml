@@ -26,4 +26,33 @@ jobs:
         run: dotnet restore "${{ env.PROJECT_PATH }}"
 
       - name: Check formatting
-        run: dotnet format "${{ env.PROJECT_PATH }}" --verify-no-changes --verbosity diagnostic
+        shell: bash
+        run: |
+          set +e
+          output=$(dotnet format "${{ env.PROJECT_PATH }}" --verify-no-changes --verbosity normal 2>&1)
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            prefix="${GITHUB_WORKSPACE:-$PWD}/$(dirname "${{ env.PROJECT_PATH }}")/"
+            {
+              echo "### ⚠️ dotnet format fehlgeschlagen"
+              echo ""
+              echo "| Datei : Zeile | Regel | Beschreibung |"
+              echo "| :--- | :--- | :--- |"
+              matched=0
+              while IFS= read -r line; do
+                if [[ "$line" =~ ^(.*)\(([0-9]+),[0-9]+\):\ error\ ([A-Za-z0-9_]+):\ (.*)\ \[.*\]$ ]]; then
+                  matched=1
+                  file="${BASH_REMATCH[1]#"$prefix"}"
+                  printf '| `%s:%s` | `%s` | %s |\n' "$file" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
+                fi
+              done <<< "$output"
+
+              if [ "$matched" -eq 0 ]; then
+                echo ""
+                echo '```text'
+                echo "$output"
+                echo '```'
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$status"
