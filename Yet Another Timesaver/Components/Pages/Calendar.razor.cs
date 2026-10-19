@@ -9,6 +9,20 @@ public partial class Calendar : ComponentBase
     RadzenScheduler<Appointment> scheduler;
     EventConsole console;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    RadzenDayView dayView;
+    RadzenWeekView weekView;
+    RadzenMonthView monthView;
+
+    //default View == 2 for Calendar
+    int selectedView = 2;
+
+    async Task OnViewChange(int index)
+    {
+        selectedView = index;
+        var view = index switch { 0 => (ISchedulerView)dayView, 1 => weekView, _ => monthView };
+        await scheduler.SelectView(view);
+    }
+
 
     bool showHeader = true;
 
@@ -45,6 +59,21 @@ public partial class Calendar : ComponentBase
         if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
         {
             args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+        }
+    }
+
+    async Task CreateTimeBooking()
+    {
+        console.Log($"Creating Timebooking");
+
+        Appointment timeBooking = await DialogService.OpenAsync<AddAppointmentPage> ("Add Appointment",
+            new Dictionary<string, object> { { "Start", DateTime.Now },  {"End", DateTime.Now.AddMinutes(30)}});
+
+        if (timeBooking != null)
+        {
+            console.Log($"Timebooking created: Start={timeBooking.Start} Ende={timeBooking.End}");
+            appointments.Add(timeBooking);
+            await scheduler.Reload();
         }
     }
 

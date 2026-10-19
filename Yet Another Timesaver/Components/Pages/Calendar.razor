@@ -2,13 +2,30 @@
 @rendermode InteractiveServer
 @inject DialogService DialogService
 
-<RadzenScheduler @ref=@scheduler AllowDateSelection="true" SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End" ShowHeader=@showHeader
-                 TextProperty="Text" SelectedIndex="2" ShowDateTitle="true"
-                 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender DaySelect="@OnDaySelect"
-                 AppointmentMove=@OnAppointmentMove AppointmentResize=@OnAppointmentResize LoadData="OnInitialized">
-    <RadzenDayView />
-    <RadzenWeekView />
-    <RadzenMonthView />
+
+<RadzenScheduler @ref=@scheduler TItem="Appointment" Data=@appointments
+                 StartProperty="Start" EndProperty="End" TextProperty="Text"
+                 SelectedIndex="2" style="height: 768px;"
+                 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect
+                 AppointmentRender=@OnAppointmentRender SlotRender=@OnSlotRender
+                 AppointmentMove=@OnAppointmentMove AppointmentResize=@OnAppointmentResize>
+    <NavigationTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" AlignItems="AlignItems.Center">
+            <RadzenButton Icon="add" Text="New" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Info" Click=@CreateTimeBooking/>
+            <RadzenSelectBar TValue="int" Value=@selectedView Change=@OnViewChange Size="ButtonSize.Small">
+                <Items>
+                    <RadzenSelectBarItem Value="0" Text="Day"   Icon="calendar_view_day" />
+                    <RadzenSelectBarItem Value="1" Text="Week"  Icon="calendar_view_week" />
+                    <RadzenSelectBarItem Value="2" Text="Month" Icon="calendar_view_month" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+    </NavigationTemplate>
+    <ChildContent>
+        <RadzenDayView @ref=@dayView />
+        <RadzenWeekView @ref=@weekView />
+        <RadzenMonthView @ref=@monthView />
+    </ChildContent>
 </RadzenScheduler>
 
-<EventConsole @ref=@console />
+    <EventConsole @ref=@console hidden="true"/>
