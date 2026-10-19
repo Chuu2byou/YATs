@@ -66,8 +66,8 @@ public partial class Calendar : ComponentBase
     {
         console.Log($"Creating Timebooking");
 
-        Appointment timeBooking = await DialogService.OpenAsync<AddAppointmentPage> ("Add Appointment",
-            new Dictionary<string, object> { { "Start", DateTime.Now },  {"End", DateTime.Now.AddMinutes(30)}});
+        Appointment timeBooking = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+            new Dictionary<string, object> { { "Start", DateTime.Now }, { "End", DateTime.Now.AddMinutes(30) } });
 
         if (timeBooking != null)
         {
