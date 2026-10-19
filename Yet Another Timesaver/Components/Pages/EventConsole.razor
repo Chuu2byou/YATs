@@ -1,4 +1,3 @@
-@using Radzen
 @using System.Text.Json
 @inject IJSRuntime JSRuntime
 <RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
@@ -7,7 +6,7 @@
             <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">Console log</RadzenText>
             <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" />
         </RadzenStack>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="0" ID="event-console" class="rz-pt-1" Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0" ID="event-console" class="rz-pt-1" Style=" min-height: 2rem; max-height: 12rem; overflow: auto;">
             @foreach (var message in messages)
             {
                 <RadzenAlert ShowIcon="false" Variant="Variant.Flat" AlertStyle="message.AlertStyle" Size="AlertSize.ExtraSmall" Shade="Shade.Lighter" AllowClose="false" Style="font-size: 0.75rem">
@@ -19,7 +18,7 @@
 </RadzenCard>
 
 
-@*I don't know what black Magic is fueling this Madness, but for the love of God, 
+@*I don't know what black Magic is fueling this Madness, but for the love of God,
 DO NOT MOVE THIS CODE SECTION TO IT'S OWN FILE*@
 @code {
     class Message
@@ -32,14 +31,6 @@ DO NOT MOVE THIS CODE SECTION TO IT'S OWN FILE*@
     [Parameter(CaptureUnmatchedValues = true)]
     public IDictionary<string, object> Attributes { get; set; }
     IList<Message> messages = new List<Message>();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("scrollToBottom", "event-console");
-        }
-    }
 
     void OnClearClick()
     {

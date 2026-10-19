@@ -1,7 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Radzen;
 using Yet_Another_Timesaver.Backend;
 using Yet_Another_Timesaver.Components;
-using Radzen;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

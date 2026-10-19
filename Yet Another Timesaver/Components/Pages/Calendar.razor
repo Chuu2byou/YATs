@@ -6,7 +6,9 @@
                  TextProperty="Text" SelectedIndex="2" ShowDateTitle="true"
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender DaySelect="@OnDaySelect"
                  AppointmentMove=@OnAppointmentMove AppointmentResize=@OnAppointmentResize LoadData="OnInitialized">
-    <RadzenDayView />
-    <RadzenWeekView />
-    <RadzenMonthView  />
+    <RadzenDayView/>
+    <RadzenWeekView/>
+    <RadzenMonthView/>
 </RadzenScheduler>
+
+<EventConsole @ref=@console />
