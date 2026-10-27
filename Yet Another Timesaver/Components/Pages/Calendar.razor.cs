@@ -8,7 +8,7 @@ namespace Yet_Another_Timesaver.Components.Pages;
 public partial class Calendar : ComponentBase
 {
     RadzenScheduler<TimeEntry> scheduler;
-    EventConsole? console { get; set; }
+    //EventConsole? console { get; set; }
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
     RadzenDayView? dayView;
     RadzenWeekView? weekView;
@@ -45,7 +45,7 @@ public partial class Calendar : ComponentBase
 
     void OnDaySelect(SchedulerDaySelectEventArgs args)
     {
-        console.Log($"DaySelect: Day={args.Day} TimeEntryCount={args.Appointments?.Count() ?? 0}");
+        //console.Log($"DaySelect: Day={args.Day} TimeEntryCount={args.Appointments?.Count() ?? 0}");
     }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
@@ -65,14 +65,14 @@ public partial class Calendar : ComponentBase
 
     async Task CreateTimeBooking()
     {
-        console.Log($"Creating Timebooking");
+        //console.Log($"Creating Timebooking");
 
         TimeEntry timeBooking = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
             new Dictionary<string, object> { { "Start", DateTime.Now }, { "End", DateTime.Now.AddMinutes(30) } });
 
         if (timeBooking != null)
         {
-            console.Log($"Timebooking created: Start={timeBooking.StartTime} Ende={timeBooking.EndTime}");
+            //console.Log($"Timebooking created: Start={timeBooking.StartTime} Ende={timeBooking.EndTime}");
             TimeEntries.Add(timeBooking);
             await scheduler.Reload();
         }
@@ -80,7 +80,7 @@ public partial class Calendar : ComponentBase
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        console?.Log($"SlotSelect: Start={args.Start} End={args.End}");
+        //console?.Log($"SlotSelect: Start={args.Start} End={args.End}");
 
         if (args.View?.Text != "Year")
         {
@@ -98,7 +98,7 @@ public partial class Calendar : ComponentBase
 
     async Task OnTimeEntrySelect(SchedulerAppointmentSelectEventArgs<TimeEntry> args)
     {
-        console?.Log($"TimeEntrySelect: TimeEntry={args.Data?.Description}");
+        //console?.Log($"TimeEntrySelect: TimeEntry={args.Data?.Description}");
 
         var copy = new TimeEntry
         {
@@ -162,7 +162,7 @@ public partial class Calendar : ComponentBase
             resizedTimeEntry.StartTime = args.Start;
             resizedTimeEntry.EndTime = args.End;
 
-            console?.Log($"TimeEntryResize: TimeEntry={resizedTimeEntry.Description} Start={args.Start} End={args.End}");
+            //console?.Log($"TimeEntryResize: TimeEntry={resizedTimeEntry.Description} Start={args.Start} End={args.End}");
 
             await scheduler.Reload();
         }
