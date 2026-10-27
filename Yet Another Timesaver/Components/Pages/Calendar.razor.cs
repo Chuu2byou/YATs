@@ -1,36 +1,51 @@
 using Microsoft.AspNetCore.Components;
 using Radzen;
 using Radzen.Blazor;
+using Yet_Another_Timesaver.Backend;
 
 namespace Yet_Another_Timesaver.Components.Pages;
 
 public partial class Calendar : ComponentBase
 {
-    RadzenScheduler<Appointment> scheduler;
-    EventConsole console;
+    RadzenScheduler<TimeEntry> scheduler;
+    //EventConsole? console { get; set; }
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    RadzenDayView? dayView;
+    RadzenWeekView? weekView;
+    RadzenMonthView? monthView;
+
+    //default View == 2 for Calendar
+    int selectedView = 2;
+
+    async Task OnViewChange(int index)
+    {
+        selectedView = index;
+        var view = index switch { 0 => (ISchedulerView)dayView, 1 => weekView, _ => monthView };
+        await scheduler.SelectView(view);
+    }
+
 
     bool showHeader = true;
 
     //Test Data
-    IList<Appointment> appointments = new List<Appointment>
+    IList<TimeEntry> TimeEntries = new List<TimeEntry>
     {
-        new() { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
-        new() { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
-        new() { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "Work from home" },
-        new() { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
-        new() { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
-        new() { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
-        new() { Start = DateTime.Today.AddHours(15), End = DateTime.Today.AddHours(16), Text = "Team standup" },
-        new() { Start = DateTime.Today.AddHours(16), End = DateTime.Today.AddHours(17), Text = "Code review" },
-        new() { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
+        new() { StartTime = DateTime.Today.AddDays(-2), EndTime = DateTime.Today.AddDays(-2), Description = "Birthday", Id = 1},
+        new() { StartTime = DateTime.Today.AddDays(-11), EndTime = DateTime.Today.AddDays(-10), Description = "Day off", Id = 2},
+        new() { StartTime = DateTime.Today.AddDays(-10), EndTime = DateTime.Today.AddDays(-8), Description = "Work from home", Id = 3},
+        new() { StartTime = DateTime.Today.AddHours(10), EndTime = DateTime.Today.AddHours(12), Description = "Online meeting", Id = 4},
+        new() { StartTime = DateTime.Today.AddHours(10), EndTime = DateTime.Today.AddHours(13), Description = "Skype call", Id = 5},
+        new() { StartTime = DateTime.Today.AddHours(14), EndTime = DateTime.Today.AddHours(14).AddMinutes(30), Description = "Dentist appointment", Id = 6},
+        new() { StartTime = DateTime.Today.AddHours(15), EndTime = DateTime.Today.AddHours(16), Description = "Team standup", Id = 7},
+        new() { StartTime = DateTime.Today.AddHours(16), EndTime = DateTime.Today.AddHours(17), Description = "Code review", Id = 8},
+        new() { StartTime = DateTime.Today.AddDays(1), EndTime = DateTime.Today.AddDays(12), Description = "Vacation", Id = 9 },
     };
 
 
 
     void OnDaySelect(SchedulerDaySelectEventArgs args)
     {
-        console.Log($"DaySelect: Day={args.Day} AppointmentCount={args.Appointments?.Count() ?? 0}");
+        //console.Log($"DaySelect: Day={args.Day} TimeEntryCount={args.Appointments?.Count() ?? 0}");
     }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
@@ -48,91 +63,106 @@ public partial class Calendar : ComponentBase
         }
     }
 
+    async Task CreateTimeBooking()
+    {
+        //console.Log($"Creating Timebooking");
+
+        TimeEntry timeBooking = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
+            new Dictionary<string, object> { { "Start", DateTime.Now }, { "End", DateTime.Now.AddMinutes(30) } });
+
+        if (timeBooking != null)
+        {
+            //console.Log($"Timebooking created: Start={timeBooking.StartTime} Ende={timeBooking.EndTime}");
+            TimeEntries.Add(timeBooking);
+            await scheduler.Reload();
+        }
+    }
+
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
+        //console?.Log($"SlotSelect: Start={args.Start} End={args.End}");
 
         if (args.View?.Text != "Year")
         {
-            Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+            TimeEntry data = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
                 new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
 
             if (data != null)
             {
-                appointments.Add(data);
+                TimeEntries.Add(data);
                 // Either call the Reload method or reassign the Data property of the Scheduler
                 await scheduler.Reload();
             }
         }
     }
 
-    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    async Task OnTimeEntrySelect(SchedulerAppointmentSelectEventArgs<TimeEntry> args)
     {
-        console.Log($"AppointmentSelect: Appointment={args.Data?.Text}");
+        //console?.Log($"TimeEntrySelect: TimeEntry={args.Data?.Description}");
 
-        var copy = new Appointment
+        var copy = new TimeEntry
         {
-            Start = args.Data.Start,
-            End = args.Data.End,
-            Text = args.Data.Text
+            StartTime = args.Data.StartTime,
+            EndTime = args.Data.EndTime,
+            Description = args.Data.Description
         };
 
-        var data = await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", copy } });
+        var data = await DialogService.OpenAsync<EditTimeEntryPage>("Edit TimeEntry", new Dictionary<string, object> { { "TimeEntry", copy } });
 
         if (data != null)
         {
-            // Update the appointment
-            args.Data.Start = data.Start;
-            args.Data.End = data.End;
-            args.Data.Text = data.Text;
+            // Update the time entry
+            args.Data.StartTime = data.StartTime;
+            args.Data.EndTime = data.EndTime;
+            args.Data.Description = data.Description;
         }
 
         await scheduler.Reload();
     }
 
-    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
+    void OnTimeEntryRender(SchedulerAppointmentRenderEventArgs<TimeEntry> args)
     {
         // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
 
-        if (args.Data.Text == "Birthday")
+        if (args.Data.Description == "Birthday")
         {
             args.Attributes["style"] = "background: red";
         }
     }
 
-    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    async Task OnTimeEntryMove(SchedulerAppointmentMoveEventArgs args)
     {
-        var draggedAppointment = appointments.FirstOrDefault(x => x == args.Appointment.Data);
+        var draggedTimeEntry = TimeEntries.FirstOrDefault(x => x == args?.Appointment?.Data);
 
-        if (draggedAppointment != null)
+        if (draggedTimeEntry != null)
         {
-            var duration = draggedAppointment.End - draggedAppointment.Start;
+            var duration = draggedTimeEntry.EndTime - draggedTimeEntry.StartTime;
 
             if (args.SlotDate.TimeOfDay == TimeSpan.Zero)
             {
-                draggedAppointment.Start = args.SlotDate.Date.Add(draggedAppointment.Start.TimeOfDay);
+                draggedTimeEntry.StartTime = args.SlotDate.Date.Add(draggedTimeEntry.StartTime.TimeOfDay);
             }
             else
             {
-                draggedAppointment.Start = args.SlotDate;
+                draggedTimeEntry.StartTime = args.SlotDate;
             }
 
-            draggedAppointment.End = draggedAppointment.Start.Add(duration);
+            draggedTimeEntry.EndTime = draggedTimeEntry.StartTime.Add((TimeSpan)duration);
 
             await scheduler.Reload();
         }
     }
 
-    async Task OnAppointmentResize(SchedulerAppointmentResizeEventArgs args)
+    async Task OnTimeEntryResize(SchedulerAppointmentResizeEventArgs args)
     {
-        var resizedAppointment = appointments.FirstOrDefault(x => x == args.Appointment.Data);
+        var resizedTimeEntry = TimeEntries.FirstOrDefault(x => x == args?.Appointment?.Data);
 
-        if (resizedAppointment != null)
+        if (resizedTimeEntry != null)
         {
-            resizedAppointment.Start = args.Start;
-            resizedAppointment.End = args.End;
+            resizedTimeEntry.StartTime = args.Start;
+            resizedTimeEntry.EndTime = args.End;
 
-            console.Log($"AppointmentResize: Appointment={resizedAppointment.Text} Start={args.Start} End={args.End}");
+            //console?.Log($"TimeEntryResize: TimeEntry={resizedTimeEntry.Description} Start={args.Start} End={args.End}");
 
             await scheduler.Reload();
         }

@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Components;
+using Yet_Another_Timesaver.Backend;
 
 namespace Yet_Another_Timesaver.Components.Pages;
 
-public partial class AddAppointmentPage : ComponentBase
+public partial class AddTimeEntryPage : ComponentBase
 {
     [Parameter]
     public DateTime Start { get; set; }
@@ -10,15 +11,15 @@ public partial class AddAppointmentPage : ComponentBase
     [Parameter]
     public DateTime End { get; set; }
 
-    Appointment model = new Appointment();
+    TimeEntry model = new TimeEntry();
 
     protected override void OnParametersSet()
     {
-        model.Start = Start;
-        model.End = End;
+        model.StartTime = Start;
+        model.EndTime = End;
     }
 
-    void OnSubmit(Appointment model)
+    void OnSubmit(TimeEntry model)
     {
         DialogService.Close(model);
     }
