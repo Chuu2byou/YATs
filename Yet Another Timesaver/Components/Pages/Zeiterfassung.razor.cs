@@ -65,7 +65,7 @@ namespace Yet_Another_Timesaver.Components.Pages
             IsWorking = false;
             currentTimeBooking.EndTime = DateTime.Now;
             EndTime = currentTimeBooking.EndTime?.ToString("T");
-            Entries.Add(currentTimeBooking);  
+            Entries.Add(currentTimeBooking);
             currentTimeBooking = null;
             StateHasChanged();
         }
