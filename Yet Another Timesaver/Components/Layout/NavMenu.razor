@@ -1,5 +1,4 @@
-﻿@inject NavigationManager NavigationManager
-<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Yet Another Timesaver</a>
     </div>
@@ -25,16 +24,7 @@
                 Zeiterfassung
             </NavLink>
         </div>
-            <NavLink Text="DE" Click=@(() => SetLanguage("de")) />
-            <NavLink title="EN" Click=@(() => SetLanguage("en")) />
     </nav>
 </div>
 
-@code {
-    void SetLanguage(string culture)
-    {
-        var uri = Uri.EscapeDataString(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
-        NavigationManager.NavigateTo($"/culture/set?culture={culture}&redirectUri=/{uri}", forceLoad: true);
-    }
-}
 
