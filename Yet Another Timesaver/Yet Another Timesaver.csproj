@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -12,10 +12,6 @@
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="Radzen.Blazor" Version="12.1.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Backend\" />
   </ItemGroup>
 
 </Project>

@@ -1,20 +1,22 @@
 @inject DialogService DialogService
+@using Yet_Another_Timesaver.Backend;
 
-<RadzenTemplateForm TItem="Appointment" Data="@model" Submit=@OnSubmit>
+
+<RadzenTemplateForm TItem="TimeEntry" Data="@model" Submit=@OnSubmit>
     <RadzenStack Gap="1rem">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Title" Style="width: 4rem;" />
-            <RadzenTextBox @bind-Value="@model.Text" Name="Text" Style="width: 12rem;" />
+            <RadzenTextBox @bind-Value="@model.Description" Name="Text" Style="width: 12rem;" />
             <RadzenRequiredValidator Component="Text" Text="Title is required" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Start" Style="width: 4rem;" />
-            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" Style="width: 12rem;" />
+            <RadzenDatePicker @bind-Value="@model.StartTime" Name="Start" ShowTime="true" Style="width: 12rem;" />
             <RadzenRequiredValidator Component="Start" Text="Start is required" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="End" Style="width: 4rem;" />
-            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" Style="width: 12rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="@model.EndTime" ShowTime="true" Style="width: 12rem;" />
             <RadzenRequiredValidator Component="End" Text="End is required" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" >

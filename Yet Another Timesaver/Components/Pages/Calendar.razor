@@ -1,14 +1,15 @@
 @page "/calendar"
+@using Yet_Another_Timesaver.Backend;
 @rendermode InteractiveServer
 @inject DialogService DialogService
 
 
-<RadzenScheduler @ref=@scheduler TItem="Appointment" Data=@appointments
-                 StartProperty="Start" EndProperty="End" TextProperty="Text"
+<RadzenScheduler @ref=@scheduler TItem="TimeEntry" Data=@TimeEntries
+                 StartProperty="StartTime" EndProperty="EndTime" TextProperty="Description"
                  SelectedIndex="2" style="height: 768px;"
-                 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect
-                 AppointmentRender=@OnAppointmentRender SlotRender=@OnSlotRender
-                 AppointmentMove=@OnAppointmentMove AppointmentResize=@OnAppointmentResize>
+                 SlotSelect=@OnSlotSelect AppointmentSelect=@OnTimeEntrySelect
+                 AppointmentRender=@OnTimeEntryRender SlotRender=@OnSlotRender
+                 AppointmentMove=@OnTimeEntryMove AppointmentResize=@OnTimeEntryResize>
     <NavigationTemplate>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" AlignItems="AlignItems.Center">
             <RadzenButton Icon="add" Text="New" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Info" Click=@CreateTimeBooking/>
@@ -28,4 +29,4 @@
     </ChildContent>
 </RadzenScheduler>
 
-    <EventConsole @ref=@console hidden="true"/>
+<EventConsole @ref=@console/>
