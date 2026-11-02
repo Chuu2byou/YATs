@@ -25,7 +25,7 @@ jobs:
         run: dotnet publish "${{ env.PROJECT_PATH }}" -c Release -o myapp
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: yats-app
           path: myapp
@@ -38,7 +38,7 @@ jobs:
       url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: yats-app
           path: myapp
