@@ -481,7 +481,5 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-# Lokale Entwickler-Konfiguration (enthält DB-Zugangsdaten)
-# Vorlage: appsettings.Development.example.json
 appsettings.Development.json
 appsettings.*.local.json
