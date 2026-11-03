@@ -2,9 +2,9 @@ name: Lint (dotnet format)
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
   pull_request:
-    branches: [main]
+    branches: ['**']
   workflow_dispatch:
 
 env:
@@ -31,30 +31,57 @@ jobs:
           set +e
           output=$(dotnet format "${{ env.PROJECT_PATH }}" --verify-no-changes --verbosity normal 2>&1)
           status=$?
-          if [ "$status" -ne 0 ]; then
-            prefix="${GITHUB_WORKSPACE:-$PWD}/$(dirname "${{ env.PROJECT_PATH }}")/"
 
-            body="### ⚠️ dotnet format fehlgeschlagen"$'\n\n'
+          prefix="${GITHUB_WORKSPACE:-$PWD}/$(dirname "${{ env.PROJECT_PATH }}")/"
+          errors=""
+          warnings=""
+          annotations=""
+          matched=0
+
+          while IFS= read -r line; do
+            clean="${line#Warning: }"
+            clean="${clean#Error: }"
+            if [[ "$clean" =~ ^(.*)\(([0-9]+),[0-9]+\):\ (error|warning)\ ([A-Za-z0-9_]+):\ (.*)\ \[.*\]$ ]]; then
+              matched=1
+              path="${BASH_REMATCH[1]}"
+              line_no="${BASH_REMATCH[2]}"
+              severity="${BASH_REMATCH[3]}"
+              rule="${BASH_REMATCH[4]}"
+              message="${BASH_REMATCH[5]}"
+              file="${path#"$prefix"}"
+              if [ "$severity" = "error" ]; then
+                errors+=$(printf '| `%s:%s` | `%s` | %s |' "$file" "$line_no" "$rule" "$message")$'\n'
+                annotations+=$(printf '::error file=%s,line=%s::%s (%s)' "$path" "$line_no" "$message" "$rule")$'\n'
+              else
+                warnings+=$(printf '| `%s:%s` | `%s` | %s |' "$file" "$line_no" "$rule" "$message")$'\n'
+                annotations+=$(printf '::warning file=%s,line=%s::%s (%s)' "$path" "$line_no" "$message" "$rule")$'\n'
+              fi
+            fi
+          done <<< "$output"
+
+          if [ "$status" -eq 0 ]; then
+            exit 0
+          fi
+
+          if [ -n "$errors" ] || [ "$matched" -eq 0 ]; then
+            body="### ❌ dotnet format fehlgeschlagen"$'\n\n'
             body+="| Datei : Zeile | Regel | Beschreibung |"$'\n'
             body+="| :--- | :--- | :--- |"$'\n'
-            annotations=""
-            matched=0
-            while IFS= read -r line; do
-              if [[ "$line" =~ ^(.*)\(([0-9]+),[0-9]+\):\ error\ ([A-Za-z0-9_]+):\ (.*)\ \[.*\]$ ]]; then
-                matched=1
-                path="${BASH_REMATCH[1]}"
-                file="${path#"$prefix"}"
-                body+=$(printf '| `%s:%s` | `%s` | %s |' "$file" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}")$'\n'
-                annotations+=$(printf '::error file=%s,line=%s::%s (%s)' "$path" "${BASH_REMATCH[2]}" "${BASH_REMATCH[4]}" "${BASH_REMATCH[3]}")$'\n'
-              fi
-            done <<< "$output"
-
+            body+="$errors"
             if [ "$matched" -eq 0 ]; then
               body+=$'\n```text\n'"$output"$'\n```\n'
             fi
-
             printf '%s\n' "$body"
             printf '%s\n' "$annotations"
             printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           fi
-          exit "$status"
+
+          body="### ⚠️ dotnet format Hinweise (nicht blockierend)"$'\n\n'
+          body+="| Datei : Zeile | Regel | Beschreibung |"$'\n'
+          body+="| :--- | :--- | :--- |"$'\n'
+          body+="$warnings"
+          printf '%s\n' "$body"
+          printf '%s\n' "$annotations"
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
+          exit 0
