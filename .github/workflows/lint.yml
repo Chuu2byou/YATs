@@ -1,0 +1,87 @@
+name: Lint (dotnet format)
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: 10.0.x
+  PROJECT_PATH: Yet Another Timesaver/Yet Another Timesaver.csproj
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore "${{ env.PROJECT_PATH }}"
+
+      - name: Check formatting
+        shell: bash
+        run: |
+          set +e
+          output=$(dotnet format "${{ env.PROJECT_PATH }}" --verify-no-changes --verbosity normal 2>&1)
+          status=$?
+
+          prefix="${GITHUB_WORKSPACE:-$PWD}/$(dirname "${{ env.PROJECT_PATH }}")/"
+          errors=""
+          warnings=""
+          annotations=""
+          matched=0
+
+          while IFS= read -r line; do
+            clean="${line#Warning: }"
+            clean="${clean#Error: }"
+            if [[ "$clean" =~ ^(.*)\(([0-9]+),[0-9]+\):\ (error|warning)\ ([A-Za-z0-9_]+):\ (.*)\ \[.*\]$ ]]; then
+              matched=1
+              path="${BASH_REMATCH[1]}"
+              line_no="${BASH_REMATCH[2]}"
+              severity="${BASH_REMATCH[3]}"
+              rule="${BASH_REMATCH[4]}"
+              message="${BASH_REMATCH[5]}"
+              file="${path#"$prefix"}"
+              if [ "$severity" = "error" ]; then
+                errors+=$(printf '| `%s:%s` | `%s` | %s |' "$file" "$line_no" "$rule" "$message")$'\n'
+                annotations+=$(printf '::error file=%s,line=%s::%s (%s)' "$path" "$line_no" "$message" "$rule")$'\n'
+              else
+                warnings+=$(printf '| `%s:%s` | `%s` | %s |' "$file" "$line_no" "$rule" "$message")$'\n'
+                annotations+=$(printf '::warning file=%s,line=%s::%s (%s)' "$path" "$line_no" "$message" "$rule")$'\n'
+              fi
+            fi
+          done <<< "$output"
+
+          if [ "$status" -eq 0 ]; then
+            exit 0
+          fi
+
+          if [ -n "$errors" ] || [ "$matched" -eq 0 ]; then
+            body="### ❌ dotnet format fehlgeschlagen"$'\n\n'
+            body+="| Datei : Zeile | Regel | Beschreibung |"$'\n'
+            body+="| :--- | :--- | :--- |"$'\n'
+            body+="$errors"
+            if [ "$matched" -eq 0 ]; then
+              body+=$'\n```text\n'"$output"$'\n```\n'
+            fi
+            printf '%s\n' "$body"
+            printf '%s\n' "$annotations"
+            printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          body="### ⚠️ dotnet format Hinweise (nicht blockierend)"$'\n\n'
+          body+="| Datei : Zeile | Regel | Beschreibung |"$'\n'
+          body+="| :--- | :--- | :--- |"$'\n'
+          body+="$warnings"
+          printf '%s\n' "$body"
+          printf '%s\n' "$annotations"
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
+          exit 0
