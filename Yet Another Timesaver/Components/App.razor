@@ -4,16 +4,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <base href="/" />
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
-    <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["Yet_Another_Timesaver.styles.css"]" />
-    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
+    <style>
+        @@import url("_content/Radzen.Blazor/css/material-base.css?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)") (prefers-color-scheme: light);
+        @@import url("_content/Radzen.Blazor/css/material-dark-base.css?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)") (prefers-color-scheme: dark);
+    </style>
+    <link rel="stylesheet" href="@Assets["app.css"]" />
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
-    <RadzenTheme Theme="material" />
 </head>
 
 <body>
