@@ -1,7 +1,7 @@
-﻿/* =====================================================================
+/* =====================================================================
    Design-Tokens
-   Hell  = dein bisheriges Design (unveraendert)
-   Dunkel = Tokyo Night, greift automatisch bei prefers-color-scheme: dark
+   Hell  = Unchanged
+   Dark = Tokyo Night
    ===================================================================== */
 
 .container-fluid {

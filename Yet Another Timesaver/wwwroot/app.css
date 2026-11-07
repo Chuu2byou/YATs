@@ -1,16 +1,15 @@
 /* =====================================================================
-   app-theme.css  -  globales Design fuer die ganze App
-   Ersetzt tokyo-night.css. Muss NACH dem Radzen-Theme geladen werden.
+   Global CSS for Yet Another Timesaver (YATS)
 
-   Hell   = bisheriges Design (lila/blau Verlauf, weisse Karten)
-   Dunkel = Tokyo Night, automatisch per prefers-color-scheme: dark
-   Groessen = fliessend (rem + clamp + vw/vh), passen sich dem Bildschirm an
+   BrightMode   = Unchanged (pruple/blue, white Karten)
+   DarkMode = Tokyo Night, automatic prefers-color-scheme: dark
+   Sizes = Dynamic via clamp() and rem, except for the sidebar which is fixed width
 
    Verwendung: das Wurzel-Element jeder Seite bekommt class="app-page"
    ===================================================================== */
 
 /* ---------------------------------------------------------------------
-   1. Design-Tokens: Farben
+   1. Design-Tokens: Colors
    --------------------------------------------------------------------- */
 
 :root {
@@ -31,7 +30,7 @@
     --app-muted: #62647c;
     --app-link: #006bb7;
 
-    /* Akzent */
+    /* Accent */
     --app-primary: #6558e8;
     --app-primary-hover: #5144d6;
     --app-on-primary: #ffffff;
@@ -39,7 +38,7 @@
     --app-focus-inner: #ffffff;
     --app-focus-ring: #258cfb;
 
-    /* Linien, Tabelle, Kalender */
+    /* Lines, Tables, Calendar */
     --app-border: #ececf4;
     --app-grid-bg: #ffffff;
     --app-grid-stripe: #fafafc;
@@ -49,7 +48,7 @@
     --app-slot-border: #ececf4;
     --app-today-bg: rgba(101, 88, 232, 0.06);
 
-    /* Sidebar (Hell: kraeftiges Lila mit weisser Schrift) */
+    /* Sidebar */
     --app-nav-bg: linear-gradient(180deg, #4f46c8 0%, #6558e8 55%, #8a63e0 100%);
     --app-nav-border: transparent;
     --app-nav-top-bg: rgba(0, 0, 0, 0.18);
@@ -61,7 +60,7 @@
     --app-nav-active-text: #ffffff;
     --app-nav-accent: #ffffff;
 
-    /* Radzen-Akzentfarben (Hell: passend zum lila Design) */
+    /* Radzen-Accentcolors */
     --rz-primary: #6558e8;
     --rz-primary-dark: #5144d6;
 }
@@ -70,7 +69,7 @@
     :root {
         color-scheme: dark;
 
-        /* Tokyo Night Palette */
+        /* Tokyo Night Pallete */
         --tn-bg-dark: #16161e;
         --tn-bg: #1a1b26;
         --tn-bg-storm: #1f2335;
@@ -105,7 +104,7 @@
         --app-muted: var(--tn-fg-dim);
         --app-link: var(--tn-blue);
 
-        /* Akzent */
+        /* Accent */
         --app-primary: var(--tn-blue);
         --app-primary-hover: #6a92e6;
         --app-on-primary: var(--tn-bg-dark);
@@ -123,7 +122,7 @@
         --app-slot-border: #2f3549;
         --app-today-bg: rgba(122, 162, 247, 0.10);
 
-        /* Sidebar (Dunkel: Tokyo Night) */
+        /* Sidebar */
         --app-nav-bg: linear-gradient(180deg, #1e2640 0%, #171822 55%, #2a2040 100%);
         --app-nav-border: var(--tn-highlight);
         --app-nav-top-bg: rgba(22, 22, 30, 0.45);
@@ -135,7 +134,7 @@
         --app-nav-active-text: var(--tn-fg);
         --app-nav-accent: var(--tn-blue);
 
-        /* Radzen-Akzentfarben */
+        /* Radzen-Accentcolours */
         --rz-primary: var(--tn-blue);
         --rz-primary-dark: var(--tn-blue-dark);
         --rz-secondary: var(--tn-purple);
@@ -161,10 +160,7 @@
 }
 
 /* ---------------------------------------------------------------------
-   2. Design-Tokens: fliessende Groessen
-   Alles in rem, damit es mit der Basisschrift mitwaechst.
-   clamp(min, bevorzugt, max): waechst mit der Fensterbreite (vw)
-   bzw. -hoehe (vh), bleibt aber zwischen Minimum und Maximum.
+   2. Design-Tokens: Dymamic Sizes
    --------------------------------------------------------------------- */
 
 :root {
@@ -184,15 +180,12 @@
     --app-cell-pad-x: clamp(0.5rem, 0.9vw, 0.75rem);
 }
 
-/* Basisschrift: 14px auf kleinen, ca. 16px bei 1280px, max. 18px auf grossen
-   Bildschirmen. Prozent statt px, damit die Browser-Schriftgroesse des
-   Nutzers (Barrierefreiheit) weiter respektiert wird. */
 html {
     font-size: clamp(87.5%, calc(0.55vw + 56%), 112.5%);
 }
 
 /* ---------------------------------------------------------------------
-   3. Globale Basis (ersetzt feste Farben aus app.css)
+   3. Globale Basis
    --------------------------------------------------------------------- */
 
 html, body {
@@ -226,7 +219,7 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   4. Seiten-Container: <div class="app-page"> auf JEDER Seite
+   4. Site-Container
    --------------------------------------------------------------------- */
 
 .app-page {
@@ -235,7 +228,7 @@ a, .btn-link {
     margin-inline: auto;
     padding: var(--app-page-pad-y) var(--app-page-pad-x);
     min-height: 100vh;
-    min-height: 100dvh;           /* beruecksichtigt die Browserleiste auf Handys */
+    min-height: 100dvh;   
     border-radius: var(--app-radius-page);
     background: var(--app-page-bg);
     color: var(--app-text);
@@ -248,7 +241,7 @@ a, .btn-link {
     color: var(--app-heading);
 }
 
-/* Text in Radzen-Komponenten (RadzenText) */
+/* Radzen-Text */
 
 .app-page .rz-text {
     color: var(--app-muted);
@@ -259,8 +252,8 @@ a, .btn-link {
     font-weight: 700;
 }
 
-/* ---------------------------------------------------------------------
-   5. Karten
+    /* ---------------------------------------------------------------------
+   5. Cards (RadzenCard)
    --------------------------------------------------------------------- */
 
 .app-page .rz-card {
@@ -298,7 +291,7 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   7. Eingabefelder (Textbox, Zahl, Dropdown, Datum)
+   7. User Fields (Textbox, Numbers, Dropdown, Dates)
    --------------------------------------------------------------------- */
 
 .app-page :is(.rz-textbox, .rz-textarea, .rz-numeric, .rz-dropdown, .rz-datepicker) {
@@ -328,7 +321,7 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   8. Tabellen (RadzenDataGrid)
+   8. Tables (RadzenDataGrid)
    --------------------------------------------------------------------- */
 
 .app-page .rz-data-grid {
@@ -363,7 +356,7 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   9. Kalender (RadzenScheduler / RadzenCalendar)
+   9. Calendar (RadzenScheduler / RadzenCalendar)
    --------------------------------------------------------------------- */
 
 .app-page .rz-scheduler {
@@ -374,26 +367,22 @@ a, .btn-link {
     box-shadow: var(--app-card-shadow);
     overflow: hidden;
 
-    /* Hoehe passt sich dem Fenster an: mind. 32rem, ca. 75 % der Fensterhoehe,
-       max. 60rem. Ein fest gesetztes Height="..." / Style="height:..." auf der
-       Komponente hat Vorrang und sollte entfernt werden. */
     height: clamp(32rem, 75vh, 60rem);
     height: clamp(32rem, 75dvh, 60rem);
 }
 
-/* Navigation oben (Zurueck / Heute / Vor, Ansicht-Umschalter) */
 .app-page .rz-scheduler :is(.rz-scheduler-nav, .rz-view-header) {
     background-color: var(--app-grid-head-bg);
     color: var(--app-muted);
     border-color: var(--app-border);
 }
 
-/* Zeitraster */
+/* Time Slots */
 .app-page .rz-scheduler .rz-slot {
     border-color: var(--app-slot-border);
 }
 
-/* Termine */
+/* Time bookings */
 .app-page .rz-scheduler .rz-event {
     border-radius: 0.5rem;
 }
@@ -406,8 +395,7 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   10. Dialoge und Dropdown-Listen
-   Werden ausserhalb von .app-page gerendert, daher ohne Praefix.
+   10. Dialogs , Dropdowns, Popups (RadzenDialog, RadzenDropdownPanel)
    --------------------------------------------------------------------- */
 
 .rz-dialog {
@@ -427,14 +415,12 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   11. Sehr kleine Bildschirme
-   Die meiste Anpassung passiert bereits ueber clamp(); hier nur,
-   was sich nicht fliessend loesen laesst.
+   11. Small Screens (Handy, Tablet)
    --------------------------------------------------------------------- */
 
 @media (max-width: 480px) {
     .app-page {
-        border-radius: 0;      /* auf dem Handy randlos statt abgerundet */
+        border-radius: 0;     
     }
 
     .app-page .rz-scheduler {
@@ -443,10 +429,7 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   12. Sidebar / Navigation
-   Zielt auf die Klassen der Blazor-Vorlage (.sidebar, .top-row,
-   .nav-item, .nav-link). Steht bewusst nach dem Scoped-CSS der Vorlage
-   und hat gleiche Spezifitaet, damit es dessen feste Farben ersetzt.
+   12. Sidebar (Navigation)
    --------------------------------------------------------------------- */
 
 .page .sidebar {
@@ -475,14 +458,12 @@ a, .btn-link {
     color: var(--app-nav-hover-text);
 }
 
-/* Aktive Seite: steht nach :hover, damit sie beim Drueberfahren erhalten bleibt */
 .sidebar .nav-item .nav-link.active {
     background-color: var(--app-nav-active-bg);
     color: var(--app-nav-active-text);
     box-shadow: inset 0.1875rem 0 0 var(--app-nav-accent);
 }
 
-/* Breite passt sich dem Fenster an (die Vorlage nutzt fest 250px) */
 @media (min-width: 641px) {
     .page .sidebar {
         width: clamp(14rem, 15vw, 18rem);
@@ -490,13 +471,9 @@ a, .btn-link {
 }
 
 /* ---------------------------------------------------------------------
-   13. Vollflaechige Seite: <div class="app-page app-page--full">
-   Fuer den Kalender: kein Rahmen, kein Innenabstand, die Seite fuellt
-   den gesamten Bereich rechts neben der Sidebar. Steht am Dateiende,
-   damit es die Regeln oben ueberschreibt.
+   13. Page with full width (Scheduler, Calendar, etc.)
    --------------------------------------------------------------------- */
 
-/* Der Innenabstand der Vorlage (.content / px-4) faellt auf dieser Seite weg */
 .content:has(.app-page--full) {
     padding: 0 !important;
 }
