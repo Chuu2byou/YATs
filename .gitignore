@@ -480,3 +480,10 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+appsettings.Development.json
+appsettings.*.local.json
+
+**/bin/
+**/obj/
+**/bin\\Debug/
