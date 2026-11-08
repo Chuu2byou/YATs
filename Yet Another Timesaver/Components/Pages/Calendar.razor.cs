@@ -7,9 +7,10 @@ namespace Yet_Another_Timesaver.Components.Pages;
 
 public partial class Calendar : ComponentBase
 {
-    RadzenScheduler<TimeEntry> scheduler;
-    //EventConsole? console { get; set; }
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    [Inject]
+    private TimeService TimeService { get; set; } = default!;
+
+    RadzenScheduler<TimeEntry> scheduler = default!;
     RadzenDayView? dayView;
     RadzenWeekView? weekView;
     RadzenMonthView? monthView;
@@ -20,44 +21,32 @@ public partial class Calendar : ComponentBase
     async Task OnViewChange(int index)
     {
         selectedView = index;
-        var view = index switch { 0 => (ISchedulerView)dayView, 1 => weekView, _ => monthView };
-        await scheduler.SelectView(view);
+        ISchedulerView? view = index switch { 0 => dayView, 1 => weekView, _ => monthView };
+        if (view is not null)
+        {
+            await scheduler.SelectView(view);
+        }
     }
 
+    IList<TimeEntry> TimeEntries = new List<TimeEntry>();
 
-    bool showHeader = true;
-
-    //Test Data
-    IList<TimeEntry> TimeEntries = new List<TimeEntry>
+    protected override async Task OnInitializedAsync()
     {
-        new() { StartTime = DateTime.Today.AddDays(-2), EndTime = DateTime.Today.AddDays(-2), Description = "Birthday", Id = 1},
-        new() { StartTime = DateTime.Today.AddDays(-11), EndTime = DateTime.Today.AddDays(-10), Description = "Day off", Id = 2},
-        new() { StartTime = DateTime.Today.AddDays(-10), EndTime = DateTime.Today.AddDays(-8), Description = "Work from home", Id = 3},
-        new() { StartTime = DateTime.Today.AddHours(10), EndTime = DateTime.Today.AddHours(12), Description = "Online meeting", Id = 4},
-        new() { StartTime = DateTime.Today.AddHours(10), EndTime = DateTime.Today.AddHours(13), Description = "Skype call", Id = 5},
-        new() { StartTime = DateTime.Today.AddHours(14), EndTime = DateTime.Today.AddHours(14).AddMinutes(30), Description = "Dentist appointment", Id = 6},
-        new() { StartTime = DateTime.Today.AddHours(15), EndTime = DateTime.Today.AddHours(16), Description = "Team standup", Id = 7},
-        new() { StartTime = DateTime.Today.AddHours(16), EndTime = DateTime.Today.AddHours(17), Description = "Code review", Id = 8},
-        new() { StartTime = DateTime.Today.AddDays(1), EndTime = DateTime.Today.AddDays(12), Description = "Vacation", Id = 9 },
-    };
-
-
-
-    void OnDaySelect(SchedulerDaySelectEventArgs args)
-    {
-        //console.Log($"DaySelect: Day={args.Day} TimeEntryCount={args.Appointments?.Count() ?? 0}");
+        TimeEntries = (await TimeService.GetAllAsync())
+            .Select(ToLocalTime)
+            .ToList();
     }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
         // Highlight today in month view
-        if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
+        if (args.View?.Text == "Month" && args.Start.Date == DateTime.Today)
         {
             args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
         }
 
         // Highlight working hours (9-18)
-        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        if ((args.View?.Text == "Week" || args.View?.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
         {
             args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
         }
@@ -65,15 +54,12 @@ public partial class Calendar : ComponentBase
 
     async Task CreateTimeBooking()
     {
-        //console.Log($"Creating Timebooking");
+        var timeBooking = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
+            new Dictionary<string, object?> { { "Start", DateTime.Now }, { "End", DateTime.Now.AddMinutes(30) } });
 
-        TimeEntry timeBooking = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
-            new Dictionary<string, object> { { "Start", DateTime.Now }, { "End", DateTime.Now.AddMinutes(30) } });
-
-        if (timeBooking != null)
+        if (timeBooking is TimeEntry entry)
         {
-            //console.Log($"Timebooking created: Start={timeBooking.StartTime} Ende={timeBooking.EndTime}");
-            TimeEntries.Add(timeBooking);
+            TimeEntries.Add(ToLocalTime(await TimeService.AddAsync(entry)));
             await scheduler.Reload();
         }
     }
@@ -84,13 +70,12 @@ public partial class Calendar : ComponentBase
 
         if (args.View?.Text != "Year")
         {
-            TimeEntry data = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
-                new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+            var data = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
+                new Dictionary<string, object?> { { "Start", args.Start }, { "End", args.End } });
 
-            if (data != null)
+            if (data is TimeEntry entry)
             {
-                TimeEntries.Add(data);
-                // Either call the Reload method or reassign the Data property of the Scheduler
+                TimeEntries.Add(ToLocalTime(await TimeService.AddAsync(entry)));
                 await scheduler.Reload();
             }
         }
@@ -98,23 +83,28 @@ public partial class Calendar : ComponentBase
 
     async Task OnTimeEntrySelect(SchedulerAppointmentSelectEventArgs<TimeEntry> args)
     {
-        //console?.Log($"TimeEntrySelect: TimeEntry={args.Data?.Description}");
+        if (args.Data is not { } selectedEntry)
+        {
+            return;
+        }
 
         var copy = new TimeEntry
         {
-            StartTime = args.Data.StartTime,
-            EndTime = args.Data.EndTime,
-            Description = args.Data.Description
+            Id = selectedEntry.Id,
+            StartTime = selectedEntry.StartTime,
+            EndTime = selectedEntry.EndTime,
+            Description = selectedEntry.Description
         };
 
-        var data = await DialogService.OpenAsync<EditTimeEntryPage>("Edit TimeEntry", new Dictionary<string, object> { { "TimeEntry", copy } });
+        var data = await DialogService.OpenAsync<EditTimeEntryPage>("Edit TimeEntry", new Dictionary<string, object?> { { "TimeEntry", copy } });
 
-        if (data != null)
+        if (data is TimeEntry updatedEntry)
         {
-            // Update the time entry
-            args.Data.StartTime = data.StartTime;
-            args.Data.EndTime = data.EndTime;
-            args.Data.Description = data.Description;
+            await SaveExistingEntryAsync(updatedEntry);
+
+            selectedEntry.StartTime = updatedEntry.StartTime;
+            selectedEntry.EndTime = updatedEntry.EndTime;
+            selectedEntry.Description = updatedEntry.Description;
         }
 
         await scheduler.Reload();
@@ -124,7 +114,7 @@ public partial class Calendar : ComponentBase
     {
         // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
 
-        if (args.Data.Description == "Birthday")
+        if (args.Data?.Description == "Birthday")
         {
             args.Attributes["style"] = "background: red";
         }
@@ -137,6 +127,10 @@ public partial class Calendar : ComponentBase
         if (draggedTimeEntry != null)
         {
             var duration = draggedTimeEntry.EndTime - draggedTimeEntry.StartTime;
+            if (duration is null)
+            {
+                return;
+            }
 
             if (args.SlotDate.TimeOfDay == TimeSpan.Zero)
             {
@@ -147,8 +141,9 @@ public partial class Calendar : ComponentBase
                 draggedTimeEntry.StartTime = args.SlotDate;
             }
 
-            draggedTimeEntry.EndTime = draggedTimeEntry.StartTime.Add((TimeSpan)duration);
+            draggedTimeEntry.EndTime = draggedTimeEntry.StartTime.Add(duration.Value);
 
+            await SaveExistingEntryAsync(draggedTimeEntry);
             await scheduler.Reload();
         }
     }
@@ -162,9 +157,27 @@ public partial class Calendar : ComponentBase
             resizedTimeEntry.StartTime = args.Start;
             resizedTimeEntry.EndTime = args.End;
 
-            //console?.Log($"TimeEntryResize: TimeEntry={resizedTimeEntry.Description} Start={args.Start} End={args.End}");
-
+            await SaveExistingEntryAsync(resizedTimeEntry);
             await scheduler.Reload();
         }
+    }
+
+    private async Task SaveExistingEntryAsync(TimeEntry entry)
+    {
+        if (!await TimeService.UpdateAsync(entry.Id, entry))
+        {
+            throw new InvalidOperationException($"Time entry {entry.Id} no longer exists.");
+        }
+    }
+
+    private static TimeEntry ToLocalTime(TimeEntry entry)
+    {
+        return new TimeEntry
+        {
+            Id = entry.Id,
+            Description = entry.Description,
+            StartTime = entry.StartTime.ToLocalTime(),
+            EndTime = entry.EndTime?.ToLocalTime()
+        };
     }
 }

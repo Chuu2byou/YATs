@@ -483,3 +483,7 @@ $RECYCLE.BIN/
 
 appsettings.Development.json
 appsettings.*.local.json
+
+**/bin/
+**/obj/
+**/bin\\Debug/

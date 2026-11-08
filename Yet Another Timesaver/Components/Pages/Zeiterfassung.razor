@@ -3,6 +3,7 @@
 @using Yet_Another_Timesaver.Backend
 @using Radzen
 @using Radzen.Blazor
+@rendermode InteractiveServer
 
 <PageTitle>Zeiterfassung</PageTitle>
 
@@ -141,21 +142,23 @@
             <Columns>
 
                 <RadzenDataGridColumn TItem="TimeEntry"
-                                      Property="Date"
+                                      Property="StartTime"
                                       Title="Datum"
                                       FormatString="{0:dd.MM.yyyy}" />
 
                 <RadzenDataGridColumn TItem="TimeEntry"
-                                      Property="Start"
-                                      Title="Beginn" />
+                                      Property="StartTime"
+                                      Title="Beginn"
+                                      FormatString="{0:HH:mm}" />
 
                 <RadzenDataGridColumn TItem="TimeEntry"
-                                      Property="End"
-                                      Title="Ende" />
+                                      Property="EndTime"
+                                      Title="Ende"
+                                      FormatString="{0:HH:mm}" />
 
                 <RadzenDataGridColumn TItem="TimeEntry"
-                                      Property="Duration"
-                                      Title="Arbeitszeit" />
+                                      Property="Description"
+                                      Title="Beschreibung" />
 
                 <RadzenDataGridColumn TItem="TimeEntry"
                                       Title="Aktionen"
