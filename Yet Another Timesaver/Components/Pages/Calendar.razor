@@ -5,6 +5,7 @@
 
 <RadzenScheduler class="app-page app-page--full" @ref=@scheduler TItem="TimeEntry" Data=@TimeEntries
                  StartProperty="StartTime" EndProperty="EndTime" TextProperty="Description"
+                 Date="@TimeService.Today"
                  SelectedIndex="2" style="width: 100%; height: calc(100vh - 120px);"
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnTimeEntrySelect
                  AppointmentRender=@OnTimeEntryRender SlotRender=@OnSlotRender

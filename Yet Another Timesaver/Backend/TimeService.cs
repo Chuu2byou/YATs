@@ -4,6 +4,9 @@ namespace Yet_Another_Timesaver.Backend;
 
 public class TimeService
 {
+    private static readonly TimeZoneInfo AppZone =
+        TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
+
     private readonly AppDbContext _db;
 
     public TimeService(AppDbContext db)
@@ -11,7 +14,23 @@ public class TimeService
         _db = db;
     }
 
-    // Select *
+    public DateTime Now => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AppZone);
+
+    public DateTime Today => Now.Date;
+
+    public DateTime ToLocal(DateTime utcTime) =>
+        TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcTime, DateTimeKind.Utc), AppZone);
+
+    public DateTime? ToLocal(DateTime? utcTime)
+    {
+        if (utcTime == null)
+        {
+            return null;
+        }
+
+        return ToLocal(utcTime.Value);
+    }
+
     public async Task<List<TimeEntry>> GetAllAsync()
     {
         return await _db.TimeEntries.AsNoTracking().ToListAsync();
@@ -26,7 +45,7 @@ public class TimeService
     {
         entry.Id = 0;
         entry.StartTime = ToUtc(entry.StartTime);
-        entry.EndTime = entry.EndTime?.ToUniversalTime();
+        entry.EndTime = ToUtc(entry.EndTime);
         _db.TimeEntries.Add(entry);
         await _db.SaveChangesAsync();
         return entry;
@@ -42,7 +61,7 @@ public class TimeService
 
         savedEntry.Description = entry.Description;
         savedEntry.StartTime = ToUtc(entry.StartTime);
-        savedEntry.EndTime = entry.EndTime?.ToUniversalTime();
+        savedEntry.EndTime = ToUtc(entry.EndTime);
         await _db.SaveChangesAsync();
         return true;
     }
@@ -60,8 +79,16 @@ public class TimeService
         return true;
     }
 
-    private static DateTime ToUtc(DateTime value)
+    private static DateTime ToUtc(DateTime localTime) =>
+        TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(localTime, DateTimeKind.Unspecified), AppZone);
+
+    private static DateTime? ToUtc(DateTime? localTime)
     {
-        return value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
+        if (localTime == null)
+        {
+            return null;
+        }
+
+        return ToUtc(localTime.Value);
     }
 }
