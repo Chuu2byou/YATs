@@ -33,14 +33,14 @@ public partial class Calendar : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         TimeEntries = (await TimeService.GetAllAsync())
-            .Select(ToLocalTime)
+            .Select(ToLocal)
             .ToList();
     }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
         // Highlight today in month view
-        if (args.View?.Text == "Month" && args.Start.Date == DateTime.Today)
+        if (args.View?.Text == "Month" && args.Start.Date == TimeService.Today)
         {
             args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
         }
@@ -55,11 +55,11 @@ public partial class Calendar : ComponentBase
     async Task CreateTimeBooking()
     {
         var timeBooking = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
-            new Dictionary<string, object?> { { "Start", DateTime.Now }, { "End", DateTime.Now.AddMinutes(30) } });
+            new Dictionary<string, object?> { { "Start", TimeService.Now }, { "End", TimeService.Now.AddMinutes(30) } });
 
         if (timeBooking is TimeEntry entry)
         {
-            TimeEntries.Add(ToLocalTime(await TimeService.AddAsync(entry)));
+            TimeEntries.Add(ToLocal(await TimeService.AddAsync(entry)));
             await scheduler.Reload();
         }
     }
@@ -75,7 +75,7 @@ public partial class Calendar : ComponentBase
 
             if (data is TimeEntry entry)
             {
-                TimeEntries.Add(ToLocalTime(await TimeService.AddAsync(entry)));
+                TimeEntries.Add(ToLocal(await TimeService.AddAsync(entry)));
                 await scheduler.Reload();
             }
         }
@@ -170,14 +170,14 @@ public partial class Calendar : ComponentBase
         }
     }
 
-    private static TimeEntry ToLocalTime(TimeEntry entry)
+    private TimeEntry ToLocal(TimeEntry entry)
     {
         return new TimeEntry
         {
             Id = entry.Id,
             Description = entry.Description,
-            StartTime = entry.StartTime.ToLocalTime(),
-            EndTime = entry.EndTime?.ToLocalTime()
+            StartTime = TimeService.ToLocal(entry.StartTime),
+            EndTime = TimeService.ToLocal(entry.EndTime)
         };
     }
 }

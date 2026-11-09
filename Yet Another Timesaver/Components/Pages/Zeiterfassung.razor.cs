@@ -14,15 +14,15 @@ public partial class Zeiterfassung
     private string StartTime = "--:--";
     private string EndTime = "--:--";
 
-    private DateTime SelectedDate = DateTime.Today;
+    private DateTime SelectedDate;
 
-    private string TodayHours => FormatHours(Entries.Where(entry => entry.StartTime.Date == DateTime.Today));
+    private string TodayHours => FormatHours(Entries.Where(entry => entry.StartTime.Date == TimeService.Today));
 
     private string WeekHours
     {
         get
         {
-            var today = DateTime.Today;
+            var today = TimeService.Today;
             var monday = today.AddDays(-(((int)today.DayOfWeek + 6) % 7));
             return FormatHours(Entries.Where(entry =>
                 entry.StartTime.Date >= monday && entry.StartTime.Date <= today));
@@ -38,14 +38,15 @@ public partial class Zeiterfassung
             : "Noch keine aktive Buchung.";
 
     private string CurrentDate =>
-        DateTime.Today.ToString("dddd, dd. MMMM yyyy");
+        TimeService.Today.ToString("dddd, dd. MMMM yyyy");
 
     private List<TimeEntry> Entries = new();
 
     protected override async Task OnInitializedAsync()
     {
+        SelectedDate = TimeService.Today;
         Entries = (await TimeService.GetAllAsync())
-            .Select(ToLocalTime)
+            .Select(ToLocal)
             .ToList();
         UpdateDisplayedBooking();
     }
@@ -55,10 +56,11 @@ public partial class Zeiterfassung
         var savedEntry = await TimeService.AddAsync(new TimeEntry
         {
             Description = "Arbeitszeit",
-            StartTime = DateTime.Now
+            StartTime = TimeService.Now
         });
-        currentTimeBooking = ToLocalTime(savedEntry);
+        currentTimeBooking = ToLocal(savedEntry);
         Entries.Add(currentTimeBooking);
+        Entries = Entries.ToList();
         IsWorking = true;
         StartTime = currentTimeBooking.StartTime.ToString("T");
         EndTime = "--:--";
@@ -71,7 +73,7 @@ public partial class Zeiterfassung
             return;
         }
 
-        currentTimeBooking.EndTime = DateTime.Now;
+        currentTimeBooking.EndTime = TimeService.Now;
         if (!await TimeService.UpdateAsync(currentTimeBooking.Id, currentTimeBooking))
         {
             throw new InvalidOperationException($"Time entry {currentTimeBooking.Id} no longer exists.");
@@ -80,6 +82,7 @@ public partial class Zeiterfassung
         EndTime = currentTimeBooking.EndTime.Value.ToString("T");
         IsWorking = false;
         currentTimeBooking = null;
+        Entries = Entries.ToList();
     }
 
     private async Task DeleteEntry(TimeEntry entry)
@@ -90,13 +93,14 @@ public partial class Zeiterfassung
         }
 
         Entries.Remove(entry);
+        Entries = Entries.ToList();
         UpdateDisplayedBooking();
     }
 
     private async Task RefreshData()
     {
         Entries = (await TimeService.GetAllAsync())
-            .Select(ToLocalTime)
+            .Select(ToLocal)
             .ToList();
         UpdateDisplayedBooking();
     }
@@ -117,29 +121,29 @@ public partial class Zeiterfassung
         }
 
         var latestEntry = Entries
-            .Where(entry => entry.StartTime.Date == DateTime.Today)
+            .Where(entry => entry.StartTime.Date == TimeService.Today)
             .OrderByDescending(entry => entry.StartTime)
             .FirstOrDefault();
         StartTime = latestEntry?.StartTime.ToString("T") ?? "--:--";
         EndTime = latestEntry?.EndTime?.ToString("T") ?? "--:--";
     }
 
-    private static TimeEntry ToLocalTime(TimeEntry entry)
+    private TimeEntry ToLocal(TimeEntry entry)
     {
         return new TimeEntry
         {
             Id = entry.Id,
             Description = entry.Description,
-            StartTime = entry.StartTime.ToLocalTime(),
-            EndTime = entry.EndTime?.ToLocalTime()
+            StartTime = TimeService.ToLocal(entry.StartTime),
+            EndTime = TimeService.ToLocal(entry.EndTime)
         };
     }
 
-    private static string FormatHours(IEnumerable<TimeEntry> entries)
+    private string FormatHours(IEnumerable<TimeEntry> entries)
     {
         var duration = entries.Aggregate(
             TimeSpan.Zero,
-            (total, entry) => total + ((entry.EndTime ?? DateTime.Now) - entry.StartTime));
+            (total, entry) => total + ((entry.EndTime ?? TimeService.Now) - entry.StartTime));
         return $"{(int)duration.TotalHours} Std. {duration.Minutes:00} Min.";
     }
 }
