@@ -1,0 +1,62 @@
+/* =====================================================================
+   Calendar.razor.css - styling specific to the Calendar/Scheduler page.
+   Scoped to this component only. Because AddTimeEntryPage/EditTimeEntryPage
+   are opened via RadzenDialogService (rendered outside this component's
+   tree), none of these rules can ever reach them - this is what fixes
+   the previous dialog layout bugs.
+   ===================================================================== */
+
+::deep .rz-scheduler {
+    background-color: var(--app-card-bg);
+    color: var(--app-text);
+    border: 1px solid var(--app-card-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-card-shadow);
+    overflow: hidden;
+    /* Fluid height: at least 32rem, ~75% of viewport height, max 60rem */
+    height: clamp(32rem, 75vh, 60rem);
+    height: clamp(32rem, 75dvh, 60rem);
+}
+
+/* Full-bleed mode (root div has class="app-page app-page--full") */
+::deep .app-page--full .rz-scheduler {
+    height: 100vh;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Top navigation (back / today / forward, Day-Week-Month switch) */
+::deep :is(.rz-scheduler-header, .rz-view-header) {
+    background-color: var(--app-grid-head-bg);
+    color: var(--app-muted);
+    border-color: var(--app-border);
+}
+
+/* Time/day grid lines */
+::deep .rz-slot {
+    border-color: var(--app-slot-border);
+}
+
+::deep .rz-today {
+    background-color: var(--app-today-bg);
+}
+
+/* Appointments (e.g. "Arbeitszeit") */
+::deep .rz-event {
+    border-radius: 0.5rem;
+    background-color: var(--app-primary);
+    color: var(--app-on-primary);
+    border: none;
+}
+
+    ::deep .rz-event:hover {
+        filter: brightness(1.1);
+    }
+
+@media (max-width: 480px) {
+    ::deep .rz-scheduler {
+        height: clamp(28rem, 70dvh, 50rem);
+    }
+}
