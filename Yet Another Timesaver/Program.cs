@@ -3,12 +3,37 @@ using Microsoft.EntityFrameworkCore;
 using Radzen;
 using Yet_Another_Timesaver.Backend;
 using Yet_Another_Timesaver.Components;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+// Authentifizierung über Cookies
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.AccessDeniedPath = "/login";
+
+        options.Cookie.Name = "YATs.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+            ? CookieSecurePolicy.SameAsRequest
+            : CookieSecurePolicy.Always;
+
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddRadzenComponents();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -36,6 +61,9 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapGet("/culture/set", (string culture, string redirectUri, HttpContext ctx) =>
 {
     ctx.Response.Cookies.Append(
@@ -52,6 +80,68 @@ app.UseRequestLocalization(new RequestLocalizationOptions()
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
+// Anmeldung
+app.MapPost("/account/login", async (
+    HttpContext context,
+    IAntiforgery antiforgery) =>
+{
+    // Schutz gegen gefälschte Formular-Anfragen
+    await antiforgery.ValidateRequestAsync(context);
+
+    var form = await context.Request.ReadFormAsync();
+
+    var username = form["username"].ToString();
+    var password = form["password"].ToString();
+
+    // Fest codierte Test-Zugangsdaten
+    const string testUsername = "admin";
+    const string testPassword = "Start123";
+
+    if (username != testUsername || password != testPassword)
+    {
+        return Results.Redirect("/login?error=1");
+    }
+
+    var claims = new[]
+    {
+        new Claim(ClaimTypes.Name, testUsername),
+        new Claim(ClaimTypes.NameIdentifier, "test-admin")
+    };
+
+    var identity = new ClaimsIdentity(
+        claims,
+        CookieAuthenticationDefaults.AuthenticationScheme);
+
+    var principal = new ClaimsPrincipal(identity);
+
+    await context.SignInAsync(
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        principal,
+        new AuthenticationProperties
+        {
+            IsPersistent = true
+        });
+
+    return Results.Redirect("/");
+})
+.AllowAnonymous();
+
+
+// Abmeldung
+app.MapPost("/account/logout", async (
+    HttpContext context,
+    IAntiforgery antiforgery) =>
+{
+    await antiforgery.ValidateRequestAsync(context);
+
+    await context.SignOutAsync(
+        CookieAuthenticationDefaults.AuthenticationScheme);
+
+    return Results.Redirect("/login");
+})
+.AllowAnonymous();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

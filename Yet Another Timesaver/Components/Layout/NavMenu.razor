@@ -10,21 +10,32 @@
     <nav class="nav flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> 
+                Home
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="calendar">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Calendar
+                <span class="bi bi-calendar-week-nav-menu" aria-hidden="true"></span> 
+                Calendar
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="zeiterfassung">
+                <span class="bi bi-stopwatch-nav-menu" aria-hidden="true"></span>
                 Zeiterfassung
             </NavLink>
         </div>
     </nav>
+
+    <div class="nav-item px-3 nav-logout">
+        <form method="post" action="/account/logout">
+            <AntiforgeryToken />
+            <button type="submit" class="nav-link">
+                <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span>
+                Logout
+            </button>
+        </form>
+    </div>
 </div>
-
-
