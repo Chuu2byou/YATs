@@ -2,9 +2,16 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 main {
+    flex: 1;
+    min-width: 0;
+}
+
+.main-content {
+    min-width: 0;
     flex: 1;
 }
 
@@ -52,10 +59,16 @@ main {
     }
 
     .sidebar {
+        flex: 0 0 250px;
         width: 250px;
         height: 100vh;
         position: sticky;
         top: 0;
+    }
+
+    .main-content {
+        flex: 1;
+        min-width: 0;
     }
 
     .top-row {
