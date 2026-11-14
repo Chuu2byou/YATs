@@ -6,7 +6,7 @@ namespace Yet_Another_Timesaver.Components.Pages;
 public partial class EditTimeEntryPage : ComponentBase
 {
     [Parameter]
-    public TimeEntry TimeEntry { get; set; }
+    public TimeEntry TimeEntry { get; set; } = default!;
 
     TimeEntry model = new TimeEntry();
 

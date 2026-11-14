@@ -1,50 +1,121 @@
-﻿/* Main dashboard */
+/* =====================================================================
+   Design-Tokens
+   Hell  = Unchanged
+   Dark = Tokyo Night
+   ===================================================================== */
+
+.container-fluid {
+    color-scheme: light;
+
+    --tb-page-bg: linear-gradient(135deg, #e2e8ff 0%, #eee3ff 45%, #dce6ff 100%);
+    --tb-text: #252641;
+    --tb-heading: #252641;
+    --tb-muted: #62647c;
+
+    --tb-card-bg: #ffffff;
+    --tb-card-border: rgba(101, 88, 232, 0.10);
+    --tb-card-shadow: 0 4px 18px rgba(80, 70, 150, 0.05);
+    --tb-card-shadow-hover: 0 8px 24px rgba(30, 35, 90, 0.08);
+
+    --tb-primary: #6558e8;
+    --tb-primary-hover: #5144d6;
+    --tb-on-primary: #ffffff;
+
+    --tb-border: #ececf4;
+    --tb-input-bg: #ffffff;
+
+    --tb-grid-bg: #ffffff;
+    --tb-grid-stripe: #fafafc;
+    --tb-grid-head-bg: #f8f8fc;
+    --tb-grid-row-border: #f0f0f6;
+    --tb-grid-hover: #fafaff;
+}
+
+@media (prefers-color-scheme: dark) {
+    .container-fluid {
+        color-scheme: dark;
+
+        --tb-page-bg: linear-gradient(135deg, #16161e 0%, #1a1b26 45%, #1f2335 100%);
+        --tb-text: #c0caf5;
+        --tb-heading: #c0caf5;
+        --tb-muted: #a9b1d6;
+
+        --tb-card-bg: #24283b;
+        --tb-card-border: rgba(122, 162, 247, 0.18);
+        --tb-card-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+        --tb-card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.50);
+
+        --tb-primary: #7aa2f7;
+        --tb-primary-hover: #6a92e6;
+        --tb-on-primary: #16161e;
+
+        --tb-border: #3b4261;
+        --tb-input-bg: #1f2335;
+
+        --tb-grid-bg: #24283b;
+        --tb-grid-stripe: #292e42;
+        --tb-grid-head-bg: #1f2335;
+        --tb-grid-row-border: #2f3549;
+        --tb-grid-hover: #2f3549;
+    }
+}
+
+/* =====================================================================
+   Main dashboard
+   ===================================================================== */
 
 .container-fluid {
     max-width: 1440px;
     margin: 0 auto;
     padding: 32px !important;
-    background-color: #f6f7fb;
+    background: var(--tb-page-bg);
     min-height: 100vh;
-    color: #252641;
+    border-radius: 18px;
+    color: var(--tb-text);
     font-family: "Segoe UI", sans-serif;
 }
 
 /* Page heading */
 
-h4 {
+h4,
+::deep h4,
+::deep h5 {
     font-weight: 700;
     letter-spacing: -0.5px;
-    color: #252641;
+    color: var(--tb-heading);
 }
 
-/* Cards */
+/* =====================================================================
+   Cards
+   ===================================================================== */
 
 ::deep .rz-card {
-    background-color: #ffffff;
-    border: 1px solid rgba(101, 88, 232, 0.10);
+    background-color: var(--tb-card-bg);
+    color: var(--tb-text);
+    border: 1px solid var(--tb-card-border);
     border-radius: 16px;
-    box-shadow: 0 4px 18px rgba(80, 70, 150, 0.05);
+    box-shadow: var(--tb-card-shadow);
 }
 
-
-    ::deep .rz-card:hover {
-        box-shadow: 0 8px 24px rgba(30, 35, 90, 0.08);
-    }
+::deep .rz-card:hover {
+    box-shadow: var(--tb-card-shadow-hover);
+}
 
 /* Text inside cards */
 
 ::deep .rz-text {
-    color: #62647c;
+    color: var(--tb-muted);
 }
 
-    ::deep .rz-text h4,
-    ::deep .rz-text h5 {
-        color: #252641;
-        font-weight: 700;
-    }
+::deep .rz-text h4,
+::deep .rz-text h5 {
+    color: var(--tb-heading);
+    font-weight: 700;
+}
 
-/* Buttons */
+/* =====================================================================
+   Buttons
+   ===================================================================== */
 
 ::deep .rz-button {
     border-radius: 9px;
@@ -52,59 +123,77 @@ h4 {
     padding: 10px 18px;
 }
 
-    /* Primary action */
+/* Primary action */
 
-    ::deep .rz-button.rz-primary {
-        background-color: #6558e8;
-        border-color: #6558e8;
-    }
+::deep .rz-button.rz-primary {
+    background-color: var(--tb-primary);
+    border-color: var(--tb-primary);
+    color: var(--tb-on-primary);
+}
 
-        ::deep .rz-button.rz-primary:hover {
-            background-color: #5144d6;
-            border-color: #5144d6;
-        }
+::deep .rz-button.rz-primary:hover {
+    background-color: var(--tb-primary-hover);
+    border-color: var(--tb-primary-hover);
+}
 
-/* Date picker */
+/* =====================================================================
+   Date picker
+   ===================================================================== */
 
 ::deep .rz-datepicker {
     border-radius: 9px;
+    background-color: var(--tb-input-bg);
+    border-color: var(--tb-border);
+    color: var(--tb-text);
 }
 
-/* Table */
+::deep .rz-datepicker input {
+    background-color: transparent;
+    color: var(--tb-text);
+}
+
+::deep .rz-datepicker .rz-datepicker-trigger,
+::deep .rz-datepicker .rzi {
+    color: var(--tb-muted);
+}
+
+/* =====================================================================
+   Table
+   ===================================================================== */
 
 ::deep .rz-data-grid {
-    border: 1px solid #ececf4;
+    background-color: var(--tb-grid-bg);
+    border: 1px solid var(--tb-border);
     border-radius: 12px;
     overflow: hidden;
 }
 
-    ::deep .rz-data-grid .rz-grid-table thead th {
-        background-color: #f8f8fc;
-        color: #62647c;
-        font-weight: 600;
-        padding: 15px 12px;
-        border-bottom: 1px solid #ececf4;
-    }
-
-    ::deep .rz-data-grid .rz-grid-table tbody td {
-        padding: 14px 12px;
-        border-bottom: 1px solid #f0f0f6;
-    }
-
-    ::deep .rz-data-grid .rz-grid-table tbody tr:hover {
-        background-color: #fafaff;
-    }
-
-/* Main page background */
-
-.container-fluid {
-    background: linear-gradient( 135deg, #e2e8ff 0%, #eee3ff 45%, #dce6ff 100% );
-    min-height: 100vh;
-    border-radius: 18px;
+::deep .rz-data-grid .rz-grid-table thead th {
+    background-color: var(--tb-grid-head-bg);
+    color: var(--tb-muted);
+    font-weight: 600;
+    padding: 15px 12px;
+    border-bottom: 1px solid var(--tb-border);
 }
 
+::deep .rz-data-grid .rz-grid-table tbody td {
+    background-color: var(--tb-grid-bg);
+    color: var(--tb-text);
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--tb-grid-row-border);
+}
 
-/* Responsive layout */
+::deep .rz-data-grid .rz-grid-table tbody tr:nth-child(even) td {
+    background-color: var(--tb-grid-stripe);
+}
+
+::deep .rz-data-grid .rz-grid-table tbody tr:hover td {
+    background-color: var(--tb-grid-hover);
+}
+
+/* =====================================================================
+   Responsive layout
+   ===================================================================== */
 
 @media (max-width: 768px) {
     .container-fluid {
