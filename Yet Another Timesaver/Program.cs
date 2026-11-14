@@ -15,6 +15,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<TimeService>();
+builder.Services.AddScoped<NotificationService>();
 
 var supportedLanguages = new[] { "en", "de" };
 

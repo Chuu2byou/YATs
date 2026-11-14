@@ -2,8 +2,18 @@
 @using Yet_Another_Timesaver.Backend;
 @rendermode InteractiveServer
 
-<RadzenTemplateForm class="app-page" TItem="TimeEntry" Data="@model" Submit=@OnSubmit>
+<RadzenTemplateForm class="app-page"
+                    TItem="TimeEntry"
+                    Data="@model"
+                    Submit=@OnSubmit>
     <RadzenStack Gap="1rem">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
+                         Size="AlertSize.Small" ShowIcon="true">
+                @errorMessage
+            </RadzenAlert>
+        }
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Title" Style="width: 6rem;" />
             <RadzenTextBox @bind-Value="@model.Description" Name="Description" Style="width: 12rem;" />
@@ -19,7 +29,9 @@
             <RadzenDatePicker Name="EndTime" @bind-Value="@model.EndTime" ShowTime="true" Style="width: 12rem;" />
             <RadzenRequiredValidator Component="EndTime" Text="End is required" />
         </RadzenStack>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" >
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat"
+                          Click=@OnDeleteClick title="Delete this entry" />
             <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
         </RadzenStack>
     </RadzenStack>

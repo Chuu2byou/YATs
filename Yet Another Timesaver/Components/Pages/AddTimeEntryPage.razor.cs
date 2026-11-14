@@ -11,7 +11,8 @@ public partial class AddTimeEntryPage : ComponentBase
     [Parameter]
     public DateTime End { get; set; }
 
-    TimeEntry model = new TimeEntry();
+    private readonly TimeEntry model = new();
+    private string? errorMessage;
 
     protected override void OnParametersSet()
     {
@@ -19,8 +20,15 @@ public partial class AddTimeEntryPage : ComponentBase
         model.EndTime = End;
     }
 
-    void OnSubmit(TimeEntry model)
+    private void OnSubmit(TimeEntry model)
     {
+        if (model.EndTime.HasValue && model.EndTime.Value <= model.StartTime)
+        {
+            errorMessage = "The end time must be after the start time.";
+            return;
+        }
+
+        errorMessage = null;
         DialogService.Close(model);
     }
 }
