@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
 using Yet_Another_Timesaver.Backend;
@@ -10,13 +12,51 @@ public partial class Calendar : ComponentBase
     [Inject]
     private TimeService TimeService { get; set; } = default!;
 
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+
     private RadzenScheduler<TimeEntry> scheduler = default!;
     private RadzenDayView? dayView;
     private RadzenWeekView? weekView;
     private RadzenMonthView? monthView;
     private IList<TimeEntry> TimeEntries = new List<TimeEntry>();
+    private WeekViewSettings weekViewSettings = WeekViewSettings.Default;
+    private readonly TimeSpan dayStart = TimeSpan.Zero;
+    private readonly TimeSpan dayEnd = TimeSpan.FromHours(24);
 
     private int selectedView = 1;
+
+    private const int DayColumnOffset = 2;
+
+    private int SaturdayColumnIndex =>
+        ((int)DayOfWeek.Saturday - (int)weekViewSettings.StartDay + 7) % 7 + DayColumnOffset;
+
+    private int SundayColumnIndex =>
+        ((int)DayOfWeek.Sunday - (int)weekViewSettings.StartDay + 7) % 7 + DayColumnOffset;
+
+    private string WeekendHideClass =>
+        weekViewSettings.WorkWeekOnly && selectedView == 1
+            ? $"wd-hide-{SaturdayColumnIndex} wd-hide-{SundayColumnIndex}"
+            : string.Empty;
+
+    private string SchedulerCssClass => $"app-page app-page--full {WeekendHideClass}";
+
+    protected override async Task OnInitializedAsync()
+    {
+        TimeEntries = (await TimeService.GetAllAsync())
+            .Select(ToLocalTime)
+            .ToList();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            weekViewSettings = await LoadWeekViewSettingsAsync();
+            StateHasChanged();
+            await scheduler.Reload();
+        }
+    }
 
     private async Task OnViewChange(int index)
     {
@@ -28,11 +68,45 @@ public partial class Calendar : ComponentBase
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task OpenWeekViewSettingsAsync()
     {
-        TimeEntries = (await TimeService.GetAllAsync())
-            .Select(ToLocalTime)
-            .ToList();
+        var result = await DialogService.OpenAsync<WeekViewSettingsDialog>("Week View Settings",
+            new Dictionary<string, object?> { { "Settings", weekViewSettings } });
+
+        if (result is WeekViewSettings updated)
+        {
+            weekViewSettings = updated;
+            await SaveWeekViewSettingsAsync();
+            await scheduler.Reload();
+        }
+    }
+
+    private async Task<WeekViewSettings> LoadWeekViewSettingsAsync()
+    {
+        try
+        {
+            var json = await JSRuntime.InvokeAsync<string?>("calendarSettings.load");
+            if (!string.IsNullOrEmpty(json))
+            {
+                var loaded = JsonSerializer.Deserialize<WeekViewSettings>(json);
+                if (loaded is not null)
+                {
+                    return loaded;
+                }
+            }
+        }
+        catch (JSException)
+        {
+            // localStorage unavailable - fall back to defaults
+        }
+
+        return WeekViewSettings.Default;
+    }
+
+    private async Task SaveWeekViewSettingsAsync()
+    {
+        var json = JsonSerializer.Serialize(weekViewSettings);
+        await JSRuntime.InvokeVoidAsync("calendarSettings.save", json);
     }
 
     private void OnSlotRender(SchedulerSlotRenderEventArgs args)

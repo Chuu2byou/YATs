@@ -4,15 +4,17 @@
 @inject DialogService DialogService
 @inject NotificationService NotificationService
 
-<RadzenScheduler class="app-page app-page--full" @ref=@scheduler TItem="TimeEntry" Data=@TimeEntries
+<RadzenScheduler class="@SchedulerCssClass" @ref=@scheduler TItem="TimeEntry" Data=@TimeEntries
                  StartProperty="StartTime" EndProperty="EndTime" TextProperty="Description"
-                 SelectedIndex="2"
+                 SelectedIndex="@selectedView"
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnTimeEntrySelect
                  AppointmentRender=@OnTimeEntryRender SlotRender=@OnSlotRender
                  AppointmentMove=@OnTimeEntryMove AppointmentResize=@OnTimeEntryResize>
     <NavigationTemplate>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" AlignItems="AlignItems.Center">
             <RadzenButton Icon="add" Text="New" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Info" Click=@CreateTimeBooking />
+            <RadzenButton Icon="settings" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat"
+                          Click=@OpenWeekViewSettingsAsync title="Week view settings" />
             <RadzenSelectBar TValue="int" Value=@selectedView Change=@OnViewChange Size="ButtonSize.Small">
                 <Items>
                     <RadzenSelectBarItem Value="0" Text="Day" Icon="calendar_view_day" />
@@ -23,8 +25,8 @@
         </RadzenStack>
     </NavigationTemplate>
     <ChildContent>
-        <RadzenDayView @ref=@dayView />
-        <RadzenWeekView @ref=@weekView />
+        <RadzenDayView @ref=@dayView StartTime="@dayStart" EndTime="@dayEnd" />
+        <RadzenWeekView @ref=@weekView StartTime="@dayStart" EndTime="@dayEnd" />
         <RadzenMonthView @ref=@monthView />
     </ChildContent>
 </RadzenScheduler>
