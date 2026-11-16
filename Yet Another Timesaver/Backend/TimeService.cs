@@ -4,31 +4,11 @@ namespace Yet_Another_Timesaver.Backend;
 
 public class TimeService
 {
-    private static readonly TimeZoneInfo AppZone =
-        TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
-
     private readonly AppDbContext _db;
 
     public TimeService(AppDbContext db)
     {
         _db = db;
-    }
-
-    public DateTime Now => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AppZone);
-
-    public DateTime Today => Now.Date;
-
-    public DateTime ToLocal(DateTime utcTime) =>
-        TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcTime, DateTimeKind.Utc), AppZone);
-
-    public DateTime? ToLocal(DateTime? utcTime)
-    {
-        if (utcTime == null)
-        {
-            return null;
-        }
-
-        return ToLocal(utcTime.Value);
     }
 
     public async Task<List<TimeEntry>> GetAllAsync()
@@ -43,9 +23,11 @@ public class TimeService
 
     public async Task<TimeEntry> AddAsync(TimeEntry entry)
     {
+        ValidateTimeRange(entry);
+
         entry.Id = 0;
         entry.StartTime = ToUtc(entry.StartTime);
-        entry.EndTime = ToUtc(entry.EndTime);
+        entry.EndTime = entry.EndTime?.ToUniversalTime();
         _db.TimeEntries.Add(entry);
         await _db.SaveChangesAsync();
         return entry;
@@ -53,6 +35,8 @@ public class TimeService
 
     public async Task<bool> UpdateAsync(int id, TimeEntry entry)
     {
+        ValidateTimeRange(entry);
+
         var savedEntry = await _db.TimeEntries.FindAsync(id);
         if (savedEntry is null)
         {
@@ -61,7 +45,7 @@ public class TimeService
 
         savedEntry.Description = entry.Description;
         savedEntry.StartTime = ToUtc(entry.StartTime);
-        savedEntry.EndTime = ToUtc(entry.EndTime);
+        savedEntry.EndTime = entry.EndTime?.ToUniversalTime();
         await _db.SaveChangesAsync();
         return true;
     }
@@ -79,16 +63,19 @@ public class TimeService
         return true;
     }
 
-    private static DateTime ToUtc(DateTime localTime) =>
-        TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(localTime, DateTimeKind.Unspecified), AppZone);
-
-    private static DateTime? ToUtc(DateTime? localTime)
+    // Throws if the entry's end time is not strictly after its start time.
+    // An unset (null) end time is allowed and skips the check, since it
+    // represents an ongoing, not-yet-finished booking.
+    private static void ValidateTimeRange(TimeEntry entry)
     {
-        if (localTime == null)
+        if (entry.EndTime.HasValue && entry.EndTime.Value <= entry.StartTime)
         {
-            return null;
+            throw new InvalidTimeRangeException("The end time must be after the start time.");
         }
+    }
 
-        return ToUtc(localTime.Value);
+    private static DateTime ToUtc(DateTime value)
+    {
+        return value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
     }
 }

@@ -448,7 +448,44 @@ label, .rz-label {
     color: var(--app-text);
     border-color: var(--app-border);
 }
+/* ---------------------------------------------------------------------
+   9b. Alerts and notifications (RadzenAlert / RadzenNotification)
+   Used for inline validation errors inside dialogs and toast-style
+   error messages from Calendar.razor.cs. Not scoped to .app-page since
+   alerts render inside dialogs too.
+   --------------------------------------------------------------------- */
 
+.rz-alert {
+    border-radius: var(--app-radius-control);
+    border: 1px solid var(--app-card-border);
+}
+
+    .rz-alert.rz-alert-danger {
+        background-color: rgba(247, 118, 142, 0.12);
+        color: var(--tn-red);
+        border-color: var(--tn-red);
+    }
+
+.rz-notification {
+    background-color: var(--app-card-bg);
+    color: var(--app-text);
+    border: 1px solid var(--app-card-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-card-shadow-hover);
+}
+
+    .rz-notification.rz-notification-danger {
+        border-color: var(--tn-red);
+    }
+
+    .rz-notification.rz-notification-success {
+        border-color: var(--tn-green);
+    }
+
+.rz-notification-message .rz-notification-title {
+    color: var(--app-heading);
+    font-weight: 700;
+}
 /* ---------------------------------------------------------------------
    10. Very small screens
    --------------------------------------------------------------------- */

@@ -49,7 +49,24 @@
     background-color: var(--app-primary);
     color: var(--app-on-primary);
     border: none;
+    height: 1.4rem;
+    line-height: 1.4rem;
+    padding: 0 0.4rem;
+    margin-bottom: 0.125rem;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+    /* The inner text node Radzen renders inside the event also needs to
+   respect the truncation - some Radzen versions wrap the label in its
+   own span that would otherwise inherit "normal" white-space. */
+    ::deep .rz-event * {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
     ::deep .rz-event:hover {
         filter: brightness(1.1);
@@ -59,4 +76,49 @@
     ::deep .rz-scheduler {
         height: clamp(28rem, 70dvh, 50rem);
     }
+}
+
+/* Work-week toggle: hides the Nth day column (1-based) when "Work week
+   only" is enabled in the Week View Settings dialog. Targets both a
+   generic table row ("tr", in case the scheduler renders a native
+   HTML table internally) and .rz-view-header (confirmed used
+   elsewhere in this file) as a fallback, since the exact internal
+   column container class is not confirmed for this Radzen version.
+   Only applied while Week view is active (see WeekendHideClass in
+   Calendar.razor.cs), so Month view's identical 7-column header is
+   never affected. */
+::deep .wd-hide-1 :is(tr, .rz-view-header) > *:nth-child(1) {
+    display: none;
+}
+
+::deep .wd-hide-2 :is(tr, .rz-view-header) > *:nth-child(2) {
+    display: none;
+}
+
+::deep .wd-hide-3 :is(tr, .rz-view-header) > *:nth-child(3) {
+    display: none;
+}
+
+::deep .wd-hide-4 :is(tr, .rz-view-header) > *:nth-child(4) {
+    display: none;
+}
+
+::deep .wd-hide-5 :is(tr, .rz-view-header) > *:nth-child(5) {
+    display: none;
+}
+
+::deep .wd-hide-6 :is(tr, .rz-view-header) > *:nth-child(6) {
+    display: none;
+}
+
+::deep .wd-hide-7 :is(tr, .rz-view-header) > *:nth-child(7) {
+    display: none;
+}
+
+::deep .wd-hide-8 :is(tr, .rz-view-header) > *:nth-child(8) {
+    display: none;
+}
+
+::deep .wd-hide-9 :is(tr, .rz-view-header) > *:nth-child(9) {
+    display: none;
 }
