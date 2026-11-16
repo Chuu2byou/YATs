@@ -25,7 +25,6 @@
                 return resourceMan;
             }
         }
-
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Globalization.CultureInfo Culture {
             get {

@@ -15,8 +15,8 @@ public partial class Calendar : ComponentBase
     RadzenWeekView? weekView;
     RadzenMonthView? monthView;
 
-    //default View == 2 for Calendar
-    int selectedView = 2;
+    //default View == 1 for Weekview
+    int selectedView = 1;
 
     async Task OnViewChange(int index)
     {

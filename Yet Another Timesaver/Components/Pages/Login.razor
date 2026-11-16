@@ -1,0 +1,71 @@
+@page "/login"
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+
+@using Radzen
+@using Radzen.Blazor
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager Navigation
+
+<RadzenStack Gap="0"
+             class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10"
+             Style="width: 100%; max-width: 400px; overflow: hidden;">
+
+    <RadzenCard class="rz-shadow-0 rz-border-radius-0 rz-p-12"
+                Style="text-align: center; background: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);">
+
+        <RadzenText TextStyle="TextStyle.DisplayH3"
+                    TagName="TagName.H2"
+                    class="rz-color-white rz-mb-0">
+            Yet Another Timesaver
+        </RadzenText>
+
+    </RadzenCard>
+
+    <RadzenCard class="rz-shadow-0 rz-p-4 rz-p-md-8">
+
+        @if (string.Equals(Error, "1", StringComparison.Ordinal))
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger">
+                Benutzername oder Passwort ist falsch.
+            </RadzenAlert>
+        }
+
+        <form method="post" action="/account/login">
+
+            <AntiforgeryToken />
+
+            <RadzenStack Gap="1rem">
+
+                <RadzenFormField Text="Benutzername" Variant="Variant.Outlined">
+                    <ChildContent>
+                        <RadzenTextBox Name="username"
+                                       @bind-Value="userName"
+                                       AutoCompleteType="AutoCompleteType.Username"
+                                       Style="width: 100%;" />
+                    </ChildContent>
+                </RadzenFormField>
+
+                <RadzenFormField Text="Passwort" Variant="Variant.Outlined">
+                    <ChildContent>
+                        <RadzenPassword Name="password"
+                                        @bind-Value="password"
+                                        AutoCompleteType="AutoCompleteType.CurrentPassword"
+                                        Style="width: 100%;" />
+                    </ChildContent>
+                </RadzenFormField>
+
+                <RadzenButton ButtonType="ButtonType.Submit"
+                              Text="Anmelden"
+                              Icon="login"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Style="width: 100%; background-color: #711c91;" />
+
+            </RadzenStack>
+
+        </form>
+
+    </RadzenCard>
+
+</RadzenStack>
+

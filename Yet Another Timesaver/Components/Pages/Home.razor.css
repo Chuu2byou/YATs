@@ -1,0 +1,121 @@
+
+/* Homepage-Hintergrund */
+.home-background {
+    position: relative;
+    isolation: isolate;
+
+    width: calc(100% + 3rem);
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0 -1.5rem;
+
+    overflow: hidden;
+
+    background: linear-gradient(
+        180deg,
+        rgb(5, 39, 103) 0%,
+        #3a0647 70%
+    );
+
+    color: #c0caf5;
+}
+
+/* Raster */
+.background-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(
+            rgba(122, 162, 247, 0.045) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(122, 162, 247, 0.045) 1px,
+            transparent 1px
+        );
+
+    background-size: 100px 100px;
+}
+
+/* Lichtakzente */
+.background-glow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at 75% 40%,
+            rgba(187, 154, 247, 0.18),
+            transparent 45%
+        ),
+        radial-gradient(
+            ellipse at 20% 80%,
+            rgba(122, 162, 247, 0.12),
+            transparent 45%
+        );
+}
+
+/* SVG-Grafik */
+.background-art {
+    position: absolute;
+
+    width: min(125%, 1550px);
+    max-width: none;
+    height: auto;
+
+    top: clamp(80px, 12vh, 150px);
+    right: -5%;
+
+    z-index: 1;
+    pointer-events: none;
+
+    opacity: 0.9;
+}
+
+/* Vorhandene Texte */
+.home-content {
+    position: relative;
+    z-index: 2;
+
+    padding: 25px 5%;
+}
+
+.home-content h1 {
+    color: #c0caf5;
+}
+
+.home-content p {
+    color: #a9b1d6;
+}
+
+/* Desktop: Ausgleich der Layout-Abstände */
+@media (min-width: 641px) {
+    .home-background {
+        width: calc(100% + 3.5rem);
+        margin: 0 -1.5rem 0 -2rem;
+    }
+
+    .background-art {
+        width: min(125%, 1550px);
+        right: -5%;
+    }
+}
+
+/* Smartphone und kleinere Fenster */
+@media (max-width: 640px) {
+    .background-art {
+        width: 120%;
+        top: 180px;
+        right: -15%;
+    }
+
+    .home-content {
+        padding: 25px 6%;
+    }
+}
