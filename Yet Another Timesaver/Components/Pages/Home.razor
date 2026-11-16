@@ -1,7 +1,21 @@
 ﻿@page "/"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
 
 <PageTitle>Yet Another Timesaver</PageTitle>
 
-<h1>Welcome to Yet Another Timesaver</h1>
+<div class="home-background">
 
-The Easiest time-recording tool of 2026
+    <div class="background-grid"></div>
+    <div class="background-glow"></div>
+    <img class="background-art"
+         src="/icons/background-home.svg"
+         alt=""
+         aria-hidden="true" />
+
+    <div class="home-content">
+        <h1>Welcome to Yet Another Timesaver</h1>
+
+        <p>The Easiest time-recording tool of 2026</p>
+    </div>
+
+</div>
