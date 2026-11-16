@@ -10,10 +10,8 @@ using Yet_Another_Timesaver.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-// Authentifizierung über Cookies
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -44,18 +42,22 @@ builder.Services.AddScoped<TimeService>();
 var supportedLanguages = new[] { "en", "de" };
 
 var app = builder.Build();
-/*
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
+
+    if (!db.Users.Any())
+    {
+        db.Users.Add(new User { Name = "admin", Password = "Start123" });
+        db.SaveChanges();
+    }
 }
-*/
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
@@ -81,12 +83,11 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 
-// Anmeldung
 app.MapPost("/account/login", async (
     HttpContext context,
-    IAntiforgery antiforgery) =>
+    IAntiforgery antiforgery,
+    AppDbContext db) =>
 {
-    // Schutz gegen gefälschte Formular-Anfragen
     await antiforgery.ValidateRequestAsync(context);
 
     var form = await context.Request.ReadFormAsync();
@@ -94,19 +95,17 @@ app.MapPost("/account/login", async (
     var username = form["username"].ToString();
     var password = form["password"].ToString();
 
-    // Fest codierte Test-Zugangsdaten
-    const string testUsername = "admin";
-    const string testPassword = "Start123";
+    var user = await db.Users.SingleOrDefaultAsync(u => u.Name == username);
 
-    if (username != testUsername || password != testPassword)
+    if (user is null || user.Password != password)
     {
         return Results.Redirect("/login?error=1");
     }
 
     var claims = new[]
     {
-        new Claim(ClaimTypes.Name, testUsername),
-        new Claim(ClaimTypes.NameIdentifier, "test-admin")
+        new Claim(ClaimTypes.Name, user.Name),
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
     };
 
     var identity = new ClaimsIdentity(
@@ -127,8 +126,6 @@ app.MapPost("/account/login", async (
 })
 .AllowAnonymous();
 
-
-// Abmeldung
 app.MapPost("/account/logout", async (
     HttpContext context,
     IAntiforgery antiforgery) =>

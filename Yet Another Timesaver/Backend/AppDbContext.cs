@@ -9,4 +9,5 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<TimeEntry> TimeEntries => Set<TimeEntry>();
+    public DbSet<User> Users => Set<User>();
 }
