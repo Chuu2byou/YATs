@@ -5,11 +5,30 @@
         <NavMenu />
     </div>
 
-    <main>
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+	<main>
+		<header class="top-row app-header">
+			<div class="header-content">
+
+				<div class="header-actions">
+
+					<span class="header-search">
+						<i class="bi bi-search"></i>
+						Search
+					</span>
+
+					<span class="header-profile" title="User Profile">
+						<i class="bi bi-person-circle"></i>
+					</span>
+
+				</div>
+
+			</div>
+		</header>
+
+		<article class="content px-4">
+			@Body
+		</article>
+	</main>
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>

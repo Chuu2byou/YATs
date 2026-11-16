@@ -79,4 +79,130 @@ main {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
     }
+
+    /* Header Navigation Bar */
+    .app-header {
+        justify-content: flex-start;
+        padding: 0 2rem;
+        background: var(--app-nav-top-bg);
+        border-bottom: 1px solid var(--app-nav-border);
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .header-title {
+        color: var(--app-heading);
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+
+    /* =========================================
+   Header - Search, Notifications and Profile
+   ========================================= */
+
+    .top-row.app-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        min-height: 4.5rem;
+        height: auto;
+        padding: 0 1.75rem;
+        background: var(--app-nav-top-bg);
+        border-bottom: 1px solid var(--app-nav-border);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    /* Search */
+
+    .header-search {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        min-width: 110px;
+        height: 40px;
+        padding: 0 0.9rem;
+        background: var(--app-input-bg);
+        border: 1px solid var(--app-border);
+        border-radius: var(--app-radius-control);
+        color: var(--app-text);
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+        .header-search i {
+            display: inline-block;
+            color: var(--app-muted);
+            font-size: 1rem;
+        }
+
+    /* Profile */
+
+    .header-profile {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: var(--app-primary);
+        color: var(--app-on-primary);
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+        .header-profile:hover {
+            background: var(--app-primary-hover);
+        }
+    }
+
+ /* Responsive layout */
+
+    @media (max-width: 900px) {
+        .top-row.app-header {
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+        }
+
+        .header-actions {
+            margin-left: auto;
+        }
+    }
+
+        ::deep .header-navigation a {
+            padding: 0.55rem 0.65rem;
+            font-size: 0.8rem;
+        }
+    }
 }
