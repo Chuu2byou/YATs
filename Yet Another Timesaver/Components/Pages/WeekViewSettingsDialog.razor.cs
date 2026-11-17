@@ -16,6 +16,11 @@ public partial class WeekViewSettingsDialog : ComponentBase
         DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday
     };
 
+    private IEnumerable<DayOfWeek> AvailableStartDays =>
+        model.WorkWeekOnly
+            ? OrderedDays.Where(day => day != DayOfWeek.Saturday && day != DayOfWeek.Sunday)
+            : OrderedDays;
+
     protected override void OnParametersSet()
     {
         model = new WeekViewSettings
@@ -23,6 +28,14 @@ public partial class WeekViewSettingsDialog : ComponentBase
             StartDay = Settings.StartDay,
             WorkWeekOnly = Settings.WorkWeekOnly
         };
+    }
+
+    private void OnWorkWeekOnlyChanged(bool value)
+    {
+        if (value && (model.StartDay == DayOfWeek.Saturday || model.StartDay == DayOfWeek.Sunday))
+        {
+            model.StartDay = DayOfWeek.Monday;
+        }
     }
 
     private void OnSaveClick()

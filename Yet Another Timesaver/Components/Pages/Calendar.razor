@@ -7,6 +7,7 @@
 <RadzenScheduler class="@SchedulerCssClass" @ref=@scheduler TItem="TimeEntry" Data=@TimeEntries
                  StartProperty="StartTime" EndProperty="EndTime" TextProperty="Description"
                  SelectedIndex="@selectedView"
+                 Culture="@weekViewCulture"
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnTimeEntrySelect
                  AppointmentRender=@OnTimeEntryRender SlotRender=@OnSlotRender
                  AppointmentMove=@OnTimeEntryMove AppointmentResize=@OnTimeEntryResize>
@@ -25,7 +26,6 @@
         </RadzenStack>
     </NavigationTemplate>
     <ChildContent>
-        <RadzenDayView @ref=@dayView StartTime="@dayStart" EndTime="@dayEnd" />
         <RadzenWeekView @ref=@weekView StartTime="@dayStart" EndTime="@dayEnd" />
         <RadzenMonthView @ref=@monthView />
     </ChildContent>

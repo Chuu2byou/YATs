@@ -11,6 +11,19 @@ public class TimeService
         _db = db;
     }
 
+    public DateTime Now => DateTime.Now;
+
+    public DateTime Today => DateTime.Now.Date;
+
+    public DateTime ToLocal(DateTime utcValue)
+    {
+        var utc = DateTime.SpecifyKind(utcValue, DateTimeKind.Utc);
+        return utc.ToLocalTime();
+    }
+
+    public DateTime? ToLocal(DateTime? utcValue)
+        => utcValue.HasValue ? ToLocal(utcValue.Value) : null;
+
     public async Task<List<TimeEntry>> GetAllAsync()
     {
         return await _db.TimeEntries.AsNoTracking().ToListAsync();
@@ -63,9 +76,6 @@ public class TimeService
         return true;
     }
 
-    // Throws if the entry's end time is not strictly after its start time.
-    // An unset (null) end time is allowed and skips the check, since it
-    // represents an ongoing, not-yet-finished booking.
     private static void ValidateTimeRange(TimeEntry entry)
     {
         if (entry.EndTime.HasValue && entry.EndTime.Value <= entry.StartTime)

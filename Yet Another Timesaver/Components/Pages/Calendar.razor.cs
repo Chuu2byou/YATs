@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -21,6 +22,7 @@ public partial class Calendar : ComponentBase
     private RadzenMonthView? monthView;
     private IList<TimeEntry> TimeEntries = new List<TimeEntry>();
     private WeekViewSettings weekViewSettings = WeekViewSettings.Default;
+    private CultureInfo weekViewCulture = CreateCulture(WeekViewSettings.Default.StartDay);
     private readonly TimeSpan dayStart = TimeSpan.Zero;
     private readonly TimeSpan dayEnd = TimeSpan.FromHours(24);
 
@@ -53,9 +55,17 @@ public partial class Calendar : ComponentBase
         if (firstRender)
         {
             weekViewSettings = await LoadWeekViewSettingsAsync();
+            weekViewCulture = CreateCulture(weekViewSettings.StartDay);
             StateHasChanged();
             await scheduler.Reload();
         }
+    }
+
+    private static CultureInfo CreateCulture(DayOfWeek startDay)
+    {
+        var culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+        culture.DateTimeFormat.FirstDayOfWeek = startDay;
+        return culture;
     }
 
     private async Task OnViewChange(int index)
@@ -76,6 +86,7 @@ public partial class Calendar : ComponentBase
         if (result is WeekViewSettings updated)
         {
             weekViewSettings = updated;
+            weekViewCulture = CreateCulture(weekViewSettings.StartDay);
             await SaveWeekViewSettingsAsync();
             await scheduler.Reload();
         }
