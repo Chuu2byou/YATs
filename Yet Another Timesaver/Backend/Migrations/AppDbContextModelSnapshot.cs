@@ -1,85 +1,79 @@
-﻿
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Yet_Another_Timesaver.Backend;
 
 #nullable disable
 
-namespace Yet_Another_Timesaver.Backend.Migrations
+namespace Yet_Another_Timesaver.Backend.Migrations;
+
+[DbContext(typeof(AppDbContext))]
+partial class AppDbContextModelSnapshot : ModelSnapshot
 {
-    [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    protected override void BuildModel(ModelBuilder modelBuilder)
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+        modelBuilder
+            .HasAnnotation("ProductVersion", "10.0.4")
+            .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+        NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Yet_Another_Timesaver.Backend.TimeEntry", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+        modelBuilder.Entity("Yet_Another_Timesaver.Backend.TimeEntry", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("EndTime")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("StartTime")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
+                b.Property<int?>("UserId")
+                    .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("TimeEntries");
-                });
+                b.ToTable("TimeEntries");
+            });
 
-            modelBuilder.Entity("Yet_Another_Timesaver.Backend.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+        modelBuilder.Entity("Yet_Another_Timesaver.Backend.User", b =>
+            {
+                b.Property<int>("UserId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Password")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.HasKey("UserId");
+                b.HasKey("UserId");
 
-                    b.ToTable("Users");
-                });
+                b.ToTable("Users");
+            });
 
-            modelBuilder.Entity("Yet_Another_Timesaver.Backend.TimeEntry", b =>
-                {
-                    b.HasOne("Yet_Another_Timesaver.Backend.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+        modelBuilder.Entity("Yet_Another_Timesaver.Backend.TimeEntry", b =>
+            {
+                b.HasOne("Yet_Another_Timesaver.Backend.User", "User")
+                    .WithMany()
+                    .HasForeignKey("UserId");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 #pragma warning restore 612, 618
-        }
     }
 }
