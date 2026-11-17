@@ -40,7 +40,12 @@ namespace Yet_Another_Timesaver.Backend.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TimeEntries");
                 });
@@ -64,6 +69,15 @@ namespace Yet_Another_Timesaver.Backend.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Yet_Another_Timesaver.Backend.TimeEntry", b =>
+                {
+                    b.HasOne("Yet_Another_Timesaver.Backend.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

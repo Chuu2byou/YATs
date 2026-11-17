@@ -15,7 +15,6 @@ namespace Yet_Another_Timesaver.Backend.Migrations
     [Migration("20261116183306_AddUsers")]
     partial class AddUsers
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
