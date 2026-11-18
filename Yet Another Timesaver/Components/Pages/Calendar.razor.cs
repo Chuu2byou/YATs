@@ -43,6 +43,10 @@ public partial class Calendar : ComponentBase
 
     private string SchedulerCssClass => $"app-page app-page--full {WeekendHideClass}";
 
+    private bool viewReady;
+
+    private string SchedulerVisibilityStyle => viewReady ? "" : "visibility: hidden;";
+
     protected override async Task OnInitializedAsync()
     {
         TimeEntries = (await TimeService.GetAllAsync())
@@ -55,9 +59,16 @@ public partial class Calendar : ComponentBase
         if (firstRender)
         {
             weekViewSettings = await LoadWeekViewSettingsAsync();
-            weekViewCulture = CreateCulture(weekViewSettings.StartDay);
-            StateHasChanged();
+
+            if (weekView is not null)
+            {
+                await scheduler.SelectView(weekView);
+            }
+
             await scheduler.Reload();
+
+            viewReady = true;
+            StateHasChanged();
         }
     }
 
@@ -75,6 +86,7 @@ public partial class Calendar : ComponentBase
         if (view is not null)
         {
             await scheduler.SelectView(view);
+            await scheduler.Reload();
         }
     }
 
@@ -200,6 +212,14 @@ public partial class Calendar : ComponentBase
         if (args.Data?.Description == "Birthday")
         {
             args.Attributes["style"] = "background: red";
+        }
+        if(args.Data?.Description == "Vacation")
+        {
+            args.Attributes["style"] = "background: green";
+        }
+        if(args.Data?.Description == "Sick Leave")
+        {
+            args.Attributes["style"] = "background: yellow";
         }
     }
 

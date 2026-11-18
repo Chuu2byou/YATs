@@ -6,7 +6,6 @@
 
 <RadzenScheduler class="@SchedulerCssClass" @ref=@scheduler TItem="TimeEntry" Data=@TimeEntries
                  StartProperty="StartTime" EndProperty="EndTime" TextProperty="Description"
-                 SelectedIndex="@selectedView"
                  Culture="@weekViewCulture"
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnTimeEntrySelect
                  AppointmentRender=@OnTimeEntryRender SlotRender=@OnSlotRender
@@ -18,7 +17,6 @@
                           Click=@OpenWeekViewSettingsAsync title="Week view settings" />
             <RadzenSelectBar TValue="int" Value=@selectedView Change=@OnViewChange Size="ButtonSize.Small">
                 <Items>
-                    <RadzenSelectBarItem Value="0" Text="Day" Icon="calendar_view_day" />
                     <RadzenSelectBarItem Value="1" Text="Week" Icon="calendar_view_week" />
                     <RadzenSelectBarItem Value="2" Text="Month" Icon="calendar_view_month" />
                 </Items>
