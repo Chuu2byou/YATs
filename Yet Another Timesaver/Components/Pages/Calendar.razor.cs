@@ -210,19 +210,11 @@ public partial class Calendar : ComponentBase
     private void OnTimeEntryRender(SchedulerAppointmentRenderEventArgs<TimeEntry> args)
     {
         if (args.Data?.Description == "Birthday")
-        {
             args.Attributes["style"] = "background: red";
-        }
-
-        if(args.Data?.Description == "Vacation")
-        {
+        if (args.Data?.Description == "Vacation")
             args.Attributes["style"] = "background: green";
-        }
-
-        if(args.Data?.Description == "Sick Leave")
-        {
+        if (args.Data?.Description == "Sick Leave")
             args.Attributes["style"] = "background: yellow";
-        }
     }
 
     private async Task OnTimeEntryMove(SchedulerAppointmentMoveEventArgs args)
