@@ -6,7 +6,7 @@
         @if (!string.IsNullOrEmpty(errorMessage))
         {
             <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
-                         Size="AlertSize.Small" ShowIcon="true">
+                         Size="AlertSize.Small" ShowIcon="true" Close=@(() => errorMessage = null)>
                 @errorMessage
             </RadzenAlert>
         }

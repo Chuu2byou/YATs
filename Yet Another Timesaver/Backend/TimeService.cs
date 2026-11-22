@@ -4,6 +4,9 @@ namespace Yet_Another_Timesaver.Backend;
 
 public class TimeService
 {
+    private static readonly TimeZoneInfo AppZone =
+        TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
+
     private readonly AppDbContext _db;
 
     public TimeService(AppDbContext db)
@@ -11,18 +14,22 @@ public class TimeService
         _db = db;
     }
 
-    public DateTime Now => DateTime.Now;
+    public DateTime Now => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AppZone);
 
-    public DateTime Today => DateTime.Now.Date;
+    public DateTime Today => Now.Date;
 
-    public DateTime ToLocal(DateTime utcValue)
+    public DateTime ToLocal(DateTime utcTime) =>
+        TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcTime, DateTimeKind.Utc), AppZone);
+
+    public DateTime? ToLocal(DateTime? utcTime)
     {
-        var utc = DateTime.SpecifyKind(utcValue, DateTimeKind.Utc);
-        return utc.ToLocalTime();
-    }
+        if (utcTime == null)
+        {
+            return null;
+        }
 
-    public DateTime? ToLocal(DateTime? utcValue)
-        => utcValue.HasValue ? ToLocal(utcValue.Value) : null;
+        return ToLocal(utcTime.Value);
+    }
 
     public async Task<List<TimeEntry>> GetAllAsync()
     {
@@ -36,9 +43,11 @@ public class TimeService
 
     public async Task<TimeEntry> AddAsync(TimeEntry entry)
     {
+        ValidateTimeRange(entry);
+
         entry.Id = 0;
         entry.StartTime = ToUtc(entry.StartTime);
-        entry.EndTime = entry.EndTime?.ToUniversalTime();
+        entry.EndTime = ToUtc(entry.EndTime);
         _db.TimeEntries.Add(entry);
         await _db.SaveChangesAsync();
         return entry;
@@ -46,6 +55,8 @@ public class TimeService
 
     public async Task<bool> UpdateAsync(int id, TimeEntry entry)
     {
+        ValidateTimeRange(entry);
+
         var savedEntry = await _db.TimeEntries.FindAsync(id);
         if (savedEntry is null)
         {
@@ -54,7 +65,7 @@ public class TimeService
 
         savedEntry.Description = entry.Description;
         savedEntry.StartTime = ToUtc(entry.StartTime);
-        savedEntry.EndTime = entry.EndTime?.ToUniversalTime();
+        savedEntry.EndTime = ToUtc(entry.EndTime);
         await _db.SaveChangesAsync();
         return true;
     }
@@ -72,8 +83,24 @@ public class TimeService
         return true;
     }
 
-    private static DateTime ToUtc(DateTime value)
+    private static void ValidateTimeRange(TimeEntry entry)
     {
-        return value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
+        if (entry.EndTime.HasValue && entry.EndTime.Value <= entry.StartTime)
+        {
+            throw new InvalidTimeRangeException("The end time must be after the start time.");
+        }
+    }
+
+    private static DateTime ToUtc(DateTime localTime) =>
+        TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(localTime, DateTimeKind.Unspecified), AppZone);
+
+    private static DateTime? ToUtc(DateTime? localTime)
+    {
+        if (localTime == null)
+        {
+            return null;
+        }
+
+        return ToUtc(localTime.Value);
     }
 }
