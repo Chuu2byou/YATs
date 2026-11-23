@@ -29,7 +29,7 @@ Yet Another Timesaver/
 ├── Backend/          # Datenmodell (TimeEntry), AppDbContext, TimeService, Migrationen, Ressourcen (de/en)
 ├── Components/
 │   ├── Layout/       # MainLayout, Navigationsmenü, Reconnect-Dialog
-│   └── Pages/        # Home, Login, Calendar, Zeiterfassung, Add-/Edit-Dialoge, Einstellungen
+│   └── Pages/        # Home, Login, Calendar, Zeiterfassung, Add-/Edit-Dialoge
 ├── Properties/       # launchSettings.json
 ├── wwwroot/          # Statische Dateien (CSS, JS, Icons, Bootstrap)
 ├── Program.cs        # Konfiguration, Authentifizierung, Lokalisierung, Endpunkte
