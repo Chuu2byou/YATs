@@ -7,6 +7,7 @@
 
 <RadzenScheduler class="@SchedulerCssClass" @ref=@scheduler TItem="TimeEntry" Data=@TimeEntries
                  StartProperty="StartTime" EndProperty="EndTime" TextProperty="Description"
+                 Date="@TimeService.Today"
                  Culture="@weekViewCulture"
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnTimeEntrySelect
                  AppointmentRender=@OnTimeEntryRender SlotRender=@OnSlotRender

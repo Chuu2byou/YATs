@@ -215,7 +215,7 @@ public partial class Calendar : ComponentBase
         if (args.Data?.Description == "Vacation")
             args.Attributes["style"] = "background: green";
         if (args.Data?.Description == "Sick Leave")
-            args.Attributes["style"] = "background: yellow";
+            args.Attributes["style"] = "background: pink";
     }
 
     private async Task OnTimeEntryMove(SchedulerAppointmentMoveEventArgs args)
