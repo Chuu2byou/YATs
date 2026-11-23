@@ -43,6 +43,8 @@ public class TimeService
 
     public async Task<TimeEntry> AddAsync(TimeEntry entry)
     {
+        ValidateTimeRange(entry);
+
         entry.Id = 0;
         entry.StartTime = ToUtc(entry.StartTime);
         entry.EndTime = ToUtc(entry.EndTime);
@@ -53,6 +55,8 @@ public class TimeService
 
     public async Task<bool> UpdateAsync(int id, TimeEntry entry)
     {
+        ValidateTimeRange(entry);
+
         var savedEntry = await _db.TimeEntries.FindAsync(id);
         if (savedEntry is null)
         {
@@ -77,6 +81,14 @@ public class TimeService
         _db.TimeEntries.Remove(entry);
         await _db.SaveChangesAsync();
         return true;
+    }
+
+    private static void ValidateTimeRange(TimeEntry entry)
+    {
+        if (entry.EndTime.HasValue && entry.EndTime.Value <= entry.StartTime)
+        {
+            throw new InvalidTimeRangeException("The end time must be after the start time.");
+        }
     }
 
     private static DateTime ToUtc(DateTime localTime) =>

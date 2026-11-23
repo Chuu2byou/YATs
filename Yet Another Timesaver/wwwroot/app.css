@@ -448,7 +448,44 @@ label, .rz-label {
     color: var(--app-text);
     border-color: var(--app-border);
 }
+/* ---------------------------------------------------------------------
+   9b. Alerts and notifications (RadzenAlert / RadzenNotification)
+   Used for inline validation errors inside dialogs and toast-style
+   error messages from Calendar.razor.cs. Not scoped to .app-page since
+   alerts render inside dialogs too.
+   --------------------------------------------------------------------- */
 
+.rz-alert {
+    border-radius: var(--app-radius-control);
+    border: 1px solid var(--app-card-border);
+}
+
+    .rz-alert.rz-alert-danger {
+        background-color: rgba(247, 118, 142, 0.12);
+        color: var(--tn-red);
+        border-color: var(--tn-red);
+    }
+
+.rz-notification {
+    background-color: var(--app-card-bg);
+    color: var(--app-text);
+    border: 1px solid var(--app-card-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-card-shadow-hover);
+}
+
+    .rz-notification.rz-notification-danger {
+        border-color: var(--tn-red);
+    }
+
+    .rz-notification.rz-notification-success {
+        border-color: var(--tn-green);
+    }
+
+.rz-notification-message .rz-notification-title {
+    color: var(--app-heading);
+    font-weight: 700;
+}
 /* ---------------------------------------------------------------------
    10. Very small screens
    --------------------------------------------------------------------- */
@@ -457,4 +494,58 @@ label, .rz-label {
     .app-page {
         border-radius: 0;
     }
+}
+
+/* =====================================================================
+   Work-week toggle for the Calendar page's RadzenScheduler week view.
+   Intentionally placed in the GLOBAL stylesheet (not a .razor.css
+   isolated file) because Blazor's component-scope attribute is not
+   reliably propagated onto markup rendered deep inside third-party
+   components like RadzenScheduler - plain, unscoped CSS avoids that
+   problem entirely.
+
+   .wd-hide-N is added to the RadzenScheduler root element (via
+   SchedulerCssClass in Calendar.razor.cs) only while Week view + the
+   "Work week only" setting are both active, so these rules never
+   affect Month view.
+
+   Header row (.rz-view-header) has an extra leading "hour label"
+   column, so day N is header child (N+1). The day-content container
+   (.rz-week-view-content) has no such extra column, so day N is
+   content child N - this is why the two nth-child indices differ by 1.
+   ===================================================================== */
+
+.wd-hide-2 .rz-view-header > *:nth-child(2),
+.wd-hide-2 .rz-week-view-content > *:nth-child(1) {
+    display: none;
+}
+
+.wd-hide-3 .rz-view-header > *:nth-child(3),
+.wd-hide-3 .rz-week-view-content > *:nth-child(2) {
+    display: none;
+}
+
+.wd-hide-4 .rz-view-header > *:nth-child(4),
+.wd-hide-4 .rz-week-view-content > *:nth-child(3) {
+    display: none;
+}
+
+.wd-hide-5 .rz-view-header > *:nth-child(5),
+.wd-hide-5 .rz-week-view-content > *:nth-child(4) {
+    display: none;
+}
+
+.wd-hide-6 .rz-view-header > *:nth-child(6),
+.wd-hide-6 .rz-week-view-content > *:nth-child(5) {
+    display: none;
+}
+
+.wd-hide-7 .rz-view-header > *:nth-child(7),
+.wd-hide-7 .rz-week-view-content > *:nth-child(6) {
+    display: none;
+}
+
+.wd-hide-8 .rz-view-header > *:nth-child(8),
+.wd-hide-8 .rz-week-view-content > *:nth-child(7) {
+    display: none;
 }

@@ -1,4 +1,7 @@
+using System.Globalization;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
 using Yet_Another_Timesaver.Backend;
@@ -10,25 +13,39 @@ public partial class Calendar : ComponentBase
     [Inject]
     private TimeService TimeService { get; set; } = default!;
 
-    RadzenScheduler<TimeEntry> scheduler = default!;
-    RadzenDayView? dayView;
-    RadzenWeekView? weekView;
-    RadzenMonthView? monthView;
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
 
-    //default View == 1 for Weekview
-    int selectedView = 1;
+    private RadzenScheduler<TimeEntry> scheduler = default!;
+    private RadzenDayView? dayView;
+    private RadzenWeekView? weekView;
+    private RadzenMonthView? monthView;
+    private IList<TimeEntry> TimeEntries = new List<TimeEntry>();
+    private WeekViewSettings weekViewSettings = WeekViewSettings.Default;
+    private CultureInfo weekViewCulture = CreateCulture(WeekViewSettings.Default.StartDay);
+    private readonly TimeSpan dayStart = TimeSpan.Zero;
+    private readonly TimeSpan dayEnd = new TimeSpan(23, 59, 59);
 
-    async Task OnViewChange(int index)
-    {
-        selectedView = index;
-        ISchedulerView? view = index switch { 0 => dayView, 1 => weekView, _ => monthView };
-        if (view is not null)
-        {
-            await scheduler.SelectView(view);
-        }
-    }
+    private int selectedView = 1;
 
-    IList<TimeEntry> TimeEntries = new List<TimeEntry>();
+    private const int DayColumnOffset = 2;
+
+    private int SaturdayColumnIndex =>
+        ((int)DayOfWeek.Saturday - (int)weekViewSettings.StartDay + 7) % 7 + DayColumnOffset;
+
+    private int SundayColumnIndex =>
+        ((int)DayOfWeek.Sunday - (int)weekViewSettings.StartDay + 7) % 7 + DayColumnOffset;
+
+    private string WeekendHideClass =>
+        weekViewSettings.WorkWeekOnly && selectedView == 1
+            ? $"wd-hide-{SaturdayColumnIndex} wd-hide-{SundayColumnIndex}"
+            : string.Empty;
+
+    private string SchedulerCssClass => $"app-page app-page--full {WeekendHideClass}";
+
+    private bool viewReady;
+
+    private string SchedulerVisibilityStyle => viewReady ? "" : "visibility: hidden;";
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,37 +54,111 @@ public partial class Calendar : ComponentBase
             .ToList();
     }
 
-    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Highlight today in month view
+        if (firstRender)
+        {
+            weekViewSettings = await LoadWeekViewSettingsAsync();
+            weekViewCulture = CreateCulture(weekViewSettings.StartDay);
+
+            if (weekView is not null)
+            {
+                await scheduler.SelectView(weekView);
+            }
+
+            await scheduler.Reload();
+
+            viewReady = true;
+            StateHasChanged();
+        }
+    }
+
+    private static CultureInfo CreateCulture(DayOfWeek startDay)
+    {
+        var culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+        culture.DateTimeFormat.FirstDayOfWeek = startDay;
+        return culture;
+    }
+
+    private async Task OnViewChange(int index)
+    {
+        selectedView = index;
+        ISchedulerView? view = index switch { 0 => dayView, 1 => weekView, _ => monthView };
+        if (view is not null)
+        {
+            await scheduler.SelectView(view);
+            await scheduler.Reload();
+        }
+    }
+
+    private async Task OpenWeekViewSettingsAsync()
+    {
+        var result = await DialogService.OpenAsync<WeekViewSettingsDialog>("Week View Settings",
+            new Dictionary<string, object?> { { "Settings", weekViewSettings } });
+
+        if (result is WeekViewSettings updated)
+        {
+            weekViewSettings = updated;
+            weekViewCulture = CreateCulture(weekViewSettings.StartDay);
+            await SaveWeekViewSettingsAsync();
+            await scheduler.Reload();
+        }
+    }
+
+    private async Task<WeekViewSettings> LoadWeekViewSettingsAsync()
+    {
+        try
+        {
+            var json = await JSRuntime.InvokeAsync<string?>("calendarSettings.load");
+            if (!string.IsNullOrEmpty(json))
+            {
+                var loaded = JsonSerializer.Deserialize<WeekViewSettings>(json);
+                if (loaded is not null)
+                {
+                    return loaded;
+                }
+            }
+        }
+        catch (JSException)
+        {
+            // localStorage unavailable - fall back to defaults
+        }
+
+        return WeekViewSettings.Default;
+    }
+
+    private async Task SaveWeekViewSettingsAsync()
+    {
+        var json = JsonSerializer.Serialize(weekViewSettings);
+        await JSRuntime.InvokeVoidAsync("calendarSettings.save", json);
+    }
+
+    private void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
         if (args.View?.Text == "Month" && args.Start.Date == TimeService.Today)
         {
             args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
         }
 
-        // Highlight working hours (9-18)
         if ((args.View?.Text == "Week" || args.View?.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
         {
             args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
         }
     }
 
-    async Task CreateTimeBooking()
+    private async Task CreateTimeBooking()
     {
         var timeBooking = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
             new Dictionary<string, object?> { { "Start", TimeService.Now }, { "End", TimeService.Now.AddMinutes(30) } });
 
         if (timeBooking is TimeEntry entry)
         {
-            TimeEntries.Add(ToLocal(await TimeService.AddAsync(entry)));
-            await scheduler.Reload();
+            await TryAddEntryAsync(entry);
         }
     }
 
-    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    private async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        //console?.Log($"SlotSelect: Start={args.Start} End={args.End}");
-
         if (args.View?.Text != "Year")
         {
             var data = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
@@ -75,13 +166,12 @@ public partial class Calendar : ComponentBase
 
             if (data is TimeEntry entry)
             {
-                TimeEntries.Add(ToLocal(await TimeService.AddAsync(entry)));
-                await scheduler.Reload();
+                await TryAddEntryAsync(entry);
             }
         }
     }
 
-    async Task OnTimeEntrySelect(SchedulerAppointmentSelectEventArgs<TimeEntry> args)
+    private async Task OnTimeEntrySelect(SchedulerAppointmentSelectEventArgs<TimeEntry> args)
     {
         if (args.Data is not { } selectedEntry)
         {
@@ -96,78 +186,156 @@ public partial class Calendar : ComponentBase
             Description = selectedEntry.Description
         };
 
-        var data = await DialogService.OpenAsync<EditTimeEntryPage>("Edit TimeEntry", new Dictionary<string, object?> { { "TimeEntry", copy } });
+        var data = await DialogService.OpenAsync<EditTimeEntryPage>("Edit TimeEntry",
+            new Dictionary<string, object?> { { "TimeEntry", copy } });
 
-        if (data is TimeEntry updatedEntry)
+        switch (data)
         {
-            await SaveExistingEntryAsync(updatedEntry);
+            case TimeEntryDeleteRequest deleteRequest:
+                await TryDeleteEntryAsync(deleteRequest.Id, selectedEntry);
+                break;
 
-            selectedEntry.StartTime = updatedEntry.StartTime;
-            selectedEntry.EndTime = updatedEntry.EndTime;
-            selectedEntry.Description = updatedEntry.Description;
+            case TimeEntry updatedEntry:
+                if (await TrySaveExistingEntryAsync(updatedEntry))
+                {
+                    selectedEntry.StartTime = updatedEntry.StartTime;
+                    selectedEntry.EndTime = updatedEntry.EndTime;
+                    selectedEntry.Description = updatedEntry.Description;
+                }
+                break;
         }
 
         await scheduler.Reload();
     }
 
-    void OnTimeEntryRender(SchedulerAppointmentRenderEventArgs<TimeEntry> args)
+    private void OnTimeEntryRender(SchedulerAppointmentRenderEventArgs<TimeEntry> args)
     {
-        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
-
         if (args.Data?.Description == "Birthday")
-        {
             args.Attributes["style"] = "background: red";
-        }
+        if (args.Data?.Description == "Vacation")
+            args.Attributes["style"] = "background: green";
+        if (args.Data?.Description == "Sick Leave")
+            args.Attributes["style"] = "background: pink";
     }
 
-    async Task OnTimeEntryMove(SchedulerAppointmentMoveEventArgs args)
+    private async Task OnTimeEntryMove(SchedulerAppointmentMoveEventArgs args)
     {
-        var draggedTimeEntry = TimeEntries.FirstOrDefault(x => x == args?.Appointment?.Data);
+        var draggedTimeEntry = TimeEntries.FirstOrDefault(x => x == args.Appointment?.Data);
 
-        if (draggedTimeEntry != null)
+        if (draggedTimeEntry is null)
         {
-            var duration = draggedTimeEntry.EndTime - draggedTimeEntry.StartTime;
-            if (duration is null)
-            {
-                return;
-            }
+            return;
+        }
 
-            if (args.SlotDate.TimeOfDay == TimeSpan.Zero)
-            {
-                draggedTimeEntry.StartTime = args.SlotDate.Date.Add(draggedTimeEntry.StartTime.TimeOfDay);
-            }
-            else
-            {
-                draggedTimeEntry.StartTime = args.SlotDate;
-            }
+        var duration = draggedTimeEntry.EndTime - draggedTimeEntry.StartTime;
+        if (duration is null)
+        {
+            return;
+        }
 
-            draggedTimeEntry.EndTime = draggedTimeEntry.StartTime.Add(duration.Value);
+        var newStart = args.SlotDate.TimeOfDay == TimeSpan.Zero
+            ? args.SlotDate.Date.Add(draggedTimeEntry.StartTime.TimeOfDay)
+            : args.SlotDate;
 
-            await SaveExistingEntryAsync(draggedTimeEntry);
+        var originalStart = draggedTimeEntry.StartTime;
+        var originalEnd = draggedTimeEntry.EndTime;
+
+        draggedTimeEntry.StartTime = newStart;
+        draggedTimeEntry.EndTime = newStart.Add(duration.Value);
+
+        if (!await TrySaveExistingEntryAsync(draggedTimeEntry))
+        {
+            draggedTimeEntry.StartTime = originalStart;
+            draggedTimeEntry.EndTime = originalEnd;
+        }
+
+        await scheduler.Reload();
+    }
+
+    private async Task OnTimeEntryResize(SchedulerAppointmentResizeEventArgs args)
+    {
+        var resizedTimeEntry = TimeEntries.FirstOrDefault(x => x == args.Appointment?.Data);
+
+        if (resizedTimeEntry is null)
+        {
+            return;
+        }
+
+        if (args.End <= args.Start)
+        {
+            ShowError("The end time must be after the start time.");
+            await scheduler.Reload();
+            return;
+        }
+
+        var originalStart = resizedTimeEntry.StartTime;
+        var originalEnd = resizedTimeEntry.EndTime;
+
+        resizedTimeEntry.StartTime = args.Start;
+        resizedTimeEntry.EndTime = args.End;
+
+        if (!await TrySaveExistingEntryAsync(resizedTimeEntry))
+        {
+            resizedTimeEntry.StartTime = originalStart;
+            resizedTimeEntry.EndTime = originalEnd;
+        }
+
+        await scheduler.Reload();
+    }
+
+    private async Task TryAddEntryAsync(TimeEntry entry)
+    {
+        try
+        {
+            TimeEntries.Add(ToLocal(await TimeService.AddAsync(entry)));
             await scheduler.Reload();
         }
-    }
-
-    async Task OnTimeEntryResize(SchedulerAppointmentResizeEventArgs args)
-    {
-        var resizedTimeEntry = TimeEntries.FirstOrDefault(x => x == args?.Appointment?.Data);
-
-        if (resizedTimeEntry != null)
+        catch (InvalidTimeRangeException ex)
         {
-            resizedTimeEntry.StartTime = args.Start;
-            resizedTimeEntry.EndTime = args.End;
-
-            await SaveExistingEntryAsync(resizedTimeEntry);
-            await scheduler.Reload();
+            ShowError(ex.Message);
         }
     }
 
-    private async Task SaveExistingEntryAsync(TimeEntry entry)
+    private async Task<bool> TrySaveExistingEntryAsync(TimeEntry entry)
     {
-        if (!await TimeService.UpdateAsync(entry.Id, entry))
+        try
         {
-            throw new InvalidOperationException($"Time entry {entry.Id} no longer exists.");
+            if (!await TimeService.UpdateAsync(entry.Id, entry))
+            {
+                ShowError("This time entry no longer exists.");
+                return false;
+            }
+
+            return true;
         }
+        catch (InvalidTimeRangeException ex)
+        {
+            ShowError(ex.Message);
+            return false;
+        }
+    }
+
+    private async Task TryDeleteEntryAsync(int id, TimeEntry selectedEntry)
+    {
+        if (await TimeService.DeleteAsync(id))
+        {
+            TimeEntries.Remove(selectedEntry);
+        }
+        else
+        {
+            ShowError("This time entry no longer exists.");
+        }
+    }
+
+    private void ShowError(string message)
+    {
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Booking error",
+            Detail = message,
+            Duration = 4000
+        });
     }
 
     private TimeEntry ToLocal(TimeEntry entry)

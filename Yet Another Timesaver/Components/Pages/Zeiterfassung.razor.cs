@@ -14,7 +14,7 @@ public partial class Zeiterfassung
     private string StartTime = "--:--";
     private string EndTime = "--:--";
 
-    private DateTime SelectedDate;
+    private DateTime? SelectedDate;
 
     private string TodayHours => FormatHours(Entries.Where(entry => entry.StartTime.Date == TimeService.Today));
 
@@ -41,6 +41,11 @@ public partial class Zeiterfassung
         TimeService.Today.ToString("dddd, dd. MMMM yyyy");
 
     private List<TimeEntry> Entries = new();
+
+    private IEnumerable<TimeEntry> FilteredEntries =>
+    SelectedDate is null
+        ? Entries
+        : Entries.Where(entry => entry.StartTime.Date == SelectedDate.Value.Date);
 
     protected override async Task OnInitializedAsync()
     {
