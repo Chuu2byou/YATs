@@ -1,3 +1,6 @@
 namespace Yet_Another_Timesaver;
 
-public class Resources { }
+/// <summary>Provides the localization resource marker type.</summary>
+public class Resources
+{
+}

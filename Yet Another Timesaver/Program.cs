@@ -10,10 +10,8 @@ using Yet_Another_Timesaver.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-// Authentifizierung über Cookies
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -45,20 +43,12 @@ builder.Services.AddScoped<NotificationService>();
 var supportedLanguages = new[] { "en", "de" };
 
 var app = builder.Build();
-/*
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-}
-*/
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
@@ -82,66 +72,62 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 
-// Anmeldung
 app.MapPost("/account/login", async (
-    HttpContext context,
-    IAntiforgery antiforgery) =>
-{
-    // Schutz gegen gefälschte Formular-Anfragen
-    await antiforgery.ValidateRequestAsync(context);
-
-    var form = await context.Request.ReadFormAsync();
-
-    var username = form["username"].ToString();
-    var password = form["password"].ToString();
-
-    // Fest codierte Test-Zugangsdaten
-    const string testUsername = "admin";
-    const string testPassword = "Start123";
-
-    if (username != testUsername || password != testPassword)
+        HttpContext context,
+        IAntiforgery antiforgery) =>
     {
-        return Results.Redirect("/login?error=1");
-    }
+        await antiforgery.ValidateRequestAsync(context);
 
-    var claims = new[]
-    {
-        new Claim(ClaimTypes.Name, testUsername),
-        new Claim(ClaimTypes.NameIdentifier, "test-admin")
-    };
+        var form = await context.Request.ReadFormAsync();
 
-    var identity = new ClaimsIdentity(
-        claims,
-        CookieAuthenticationDefaults.AuthenticationScheme);
+        var username = form["username"].ToString();
+        var password = form["password"].ToString();
 
-    var principal = new ClaimsPrincipal(identity);
+        const string testUsername = "admin";
+        const string testPassword = "Start123";
 
-    await context.SignInAsync(
-        CookieAuthenticationDefaults.AuthenticationScheme,
-        principal,
-        new AuthenticationProperties
+        if (username != testUsername || password != testPassword)
         {
-            IsPersistent = true
-        });
+            return Results.Redirect("/login?error=1");
+        }
 
-    return Results.Redirect("/");
-})
-.AllowAnonymous();
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, testUsername),
+            new Claim(ClaimTypes.NameIdentifier, "test-admin")
+        };
+
+        var identity = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var principal = new ClaimsPrincipal(identity);
+
+        await context.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            new AuthenticationProperties
+            {
+                IsPersistent = true
+            });
+
+        return Results.Redirect("/");
+    })
+    .AllowAnonymous();
 
 
-// Abmeldung
 app.MapPost("/account/logout", async (
-    HttpContext context,
-    IAntiforgery antiforgery) =>
-{
-    await antiforgery.ValidateRequestAsync(context);
+        HttpContext context,
+        IAntiforgery antiforgery) =>
+    {
+        await antiforgery.ValidateRequestAsync(context);
 
-    await context.SignOutAsync(
-        CookieAuthenticationDefaults.AuthenticationScheme);
+        await context.SignOutAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme);
 
-    return Results.Redirect("/login");
-})
-.AllowAnonymous();
+        return Results.Redirect("/login");
+    })
+    .AllowAnonymous();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

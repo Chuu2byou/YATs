@@ -64,7 +64,7 @@ jobs:
           fi
 
           if [ -n "$errors" ] || [ "$matched" -eq 0 ]; then
-            body="### ❌ dotnet format fehlgeschlagen"$'\n\n'
+            body="### ❌ dotnet format failed"$'\n\n'
             body+="| Datei : Zeile | Regel | Beschreibung |"$'\n'
             body+="| :--- | :--- | :--- |"$'\n'
             body+="$errors"
@@ -77,7 +77,7 @@ jobs:
             exit 1
           fi
 
-          body="### ⚠️ dotnet format Hinweise (nicht blockierend)"$'\n\n'
+          body="### ⚠️ dotnet format notes (non-blocking)"$'\n\n'
           body+="| Datei : Zeile | Regel | Beschreibung |"$'\n'
           body+="| :--- | :--- | :--- |"$'\n'
           body+="$warnings"

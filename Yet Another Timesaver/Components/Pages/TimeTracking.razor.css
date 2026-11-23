@@ -1,0 +1,123 @@
+
+.container-fluid {
+    max-width: var(--app-page-max-width);
+    margin: 0 auto;
+    padding: var(--app-page-pad-y) var(--app-page-pad-x) !important;
+    background: var(--app-page-bg);
+    min-height: 100vh;
+    min-height: 100dvh;
+    border-radius: var(--app-radius-page);
+    color: var(--app-text);
+    font-family: "Segoe UI", sans-serif;
+}
+
+
+h4,
+::deep h4,
+::deep h5 {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--app-heading);
+}
+
+
+::deep .rz-card {
+    background-color: var(--app-card-bg);
+    color: var(--app-text);
+    border: 1px solid var(--app-card-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-card-shadow);
+}
+
+::deep .rz-card:hover {
+    box-shadow: var(--app-card-shadow-hover);
+}
+
+::deep .rz-text {
+    color: var(--app-muted);
+}
+
+::deep .rz-text h4,
+::deep .rz-text h5 {
+    color: var(--app-heading);
+    font-weight: 700;
+}
+
+
+::deep .rz-button {
+    border-radius: var(--app-radius-control);
+    font-weight: 600;
+    padding: var(--app-btn-pad-y) var(--app-btn-pad-x);
+}
+
+::deep .rz-button.rz-primary {
+    background-color: var(--app-primary);
+    border-color: var(--app-primary);
+    color: var(--app-on-primary);
+}
+
+::deep .rz-button.rz-primary:hover {
+    background-color: var(--app-primary-hover);
+    border-color: var(--app-primary-hover);
+}
+
+
+::deep .rz-datepicker {
+    border-radius: var(--app-radius-control);
+    background-color: var(--app-input-bg);
+    border-color: var(--app-border);
+    color: var(--app-text);
+}
+
+::deep .rz-datepicker input {
+    background-color: transparent;
+    color: var(--app-text);
+}
+
+::deep .rz-datepicker .rz-datepicker-trigger,
+::deep .rz-datepicker .rzi {
+    color: var(--app-muted);
+}
+
+
+::deep .rz-data-grid {
+    background-color: var(--app-grid-bg);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-grid);
+    overflow: hidden;
+}
+
+::deep .rz-data-grid .rz-grid-table thead th {
+    background-color: var(--app-grid-head-bg);
+    color: var(--app-muted);
+    font-weight: 600;
+    padding: var(--app-cell-pad-y) var(--app-cell-pad-x);
+    border-bottom: 1px solid var(--app-border);
+}
+
+::deep .rz-data-grid .rz-grid-table tbody td {
+    background-color: var(--app-grid-bg);
+    color: var(--app-text);
+    padding: var(--app-cell-pad-y) var(--app-cell-pad-x);
+    border-bottom: 1px solid var(--app-grid-row-border);
+}
+
+::deep .rz-data-grid .rz-grid-table tbody tr:nth-child(even) td {
+    background-color: var(--app-grid-stripe);
+}
+
+::deep .rz-data-grid .rz-grid-table tbody tr:hover td {
+    background-color: var(--app-grid-hover);
+}
+
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: var(--app-page-pad-y) 1rem !important;
+    }
+
+    ::deep .rz-card {
+        padding: var(--app-card-pad);
+        border-radius: var(--app-radius-card);
+    }
+}

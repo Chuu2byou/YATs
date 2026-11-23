@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Yet_Another_Timesaver.Backend;
 
+/// <summary>Manages time entries and time zone conversions.</summary>
 public class TimeService
 {
     private static readonly TimeZoneInfo AppZone =

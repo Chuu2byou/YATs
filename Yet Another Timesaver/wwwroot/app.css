@@ -1,28 +1,7 @@
-/* =====================================================================
-   app.css - Global base styles and design tokens for the whole app.
-   Dark mode (Tokyo Night) is hardcoded - there is no light theme.
-
-   Only rules that apply across ALL pages belong here:
-     - color tokens / design tokens
-     - base typography & reset
-     - generic Radzen component styling (buttons, inputs, cards, tables)
-     - the page container (.app-page)
-     - sidebar color tokens (structure lives in MainLayout/NavMenu)
-     - dialogs (RadzenDialogService renders outside of any page, so
-       dialog styling must live here, not in a page-scoped .razor.css)
-
-   Anything specific to ONE page/component (e.g. the scheduler on the
-   Calendar page) belongs in that component's own .razor.css file so it
-   cannot leak into dialogs or other pages.
-   ===================================================================== */
-
-/* ---------------------------------------------------------------------
-   1. Design tokens - Tokyo Night palette (hardcoded, no light mode)
-   --------------------------------------------------------------------- */
 
 :root {
     color-scheme: dark;
-    /* Tokyo Night base palette */
+
     --tn-bg-dark: #16161e;
     --tn-bg: #1a1b26;
     --tn-bg-storm: #1f2335;
@@ -41,8 +20,8 @@
     --tn-orange: #ff9e64;
     --tn-red: #f7768e;
     --tn-teal: #73daca;
-    /* Semantic tokens - used throughout the app and page-specific CSS */
-    /* Surfaces */
+
+
     --app-body-bg: var(--tn-bg-dark);
     --app-page-bg: linear-gradient(135deg, #16161e 0%, #1a1b26 45%, #1f2335 100%);
     --app-card-bg: var(--tn-surface);
@@ -50,19 +29,19 @@
     --app-card-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
     --app-card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.50);
     --app-input-bg: var(--tn-bg-storm);
-    /* Text */
+
     --app-text: var(--tn-fg);
     --app-heading: var(--tn-fg);
     --app-muted: var(--tn-fg-dim);
     --app-link: var(--tn-blue);
-    /* Accent */
+
     --app-primary: var(--tn-blue);
     --app-primary-hover: #6a92e6;
     --app-on-primary: var(--tn-bg-dark);
     --app-danger: var(--tn-red);
     --app-focus-inner: var(--tn-bg);
     --app-focus-ring: var(--tn-blue);
-    /* Lines, tables, calendar */
+
     --app-border: var(--tn-border);
     --app-grid-bg: var(--tn-surface);
     --app-grid-stripe: var(--tn-highlight);
@@ -71,7 +50,7 @@
     --app-grid-hover: #2f3549;
     --app-slot-border: #2f3549;
     --app-today-bg: rgba(122, 162, 247, 0.10);
-    /* Sidebar */
+
     --app-nav-bg: linear-gradient(180deg, #1e2640 0%, #171822 55%, #2a2040 100%);
     --app-nav-border: var(--tn-highlight);
     --app-nav-top-bg: rgba(22, 22, 30, 0.45);
@@ -82,7 +61,7 @@
     --app-nav-active-bg: rgba(122, 162, 247, 0.16);
     --app-nav-active-text: var(--tn-fg);
     --app-nav-accent: var(--tn-blue);
-    /* Radzen accent colors */
+
     --rz-primary: var(--tn-blue);
     --rz-primary-dark: var(--tn-blue-dark);
     --rz-secondary: var(--tn-purple);
@@ -98,15 +77,12 @@
     --rz-series-6: var(--tn-orange);
     --rz-series-7: var(--tn-red);
     --rz-series-8: var(--tn-teal);
-    /* Bootstrap variables shipped with the Blazor template */
+
     --bs-body-bg: var(--tn-bg-dark);
     --bs-body-color: var(--tn-fg);
     --bs-border-color: var(--tn-border);
 }
 
-/* ---------------------------------------------------------------------
-   2. Fluid sizing tokens
-   --------------------------------------------------------------------- */
 
 :root {
     --app-page-max-width: 100rem;
@@ -123,16 +99,11 @@
     --app-cell-pad-x: clamp(0.5rem, 0.9vw, 0.75rem);
 }
 
-/* Base font size: 14px on small screens, ~16px at 1280px, max 18px on
-   large screens. Uses % instead of px so browser accessibility font
-   size settings are still respected. */
+
 html {
     font-size: clamp(87.5%, calc(0.55vw + 56%), 112.5%);
 }
 
-/* ---------------------------------------------------------------------
-   3. Global base
-   --------------------------------------------------------------------- */
 
 html, body {
     background-color: var(--app-body-bg);
@@ -162,7 +133,7 @@ a, .btn-link {
     border-color: var(--app-primary);
 }
 
-/* Generic root wrapper used by some layouts/App.razor */
+
 .page-container {
     background: linear-gradient(135deg, var(--tn-bg-dark), var(--tn-bg));
 }
@@ -182,17 +153,13 @@ a, .btn-link {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
 
-/* ---------------------------------------------------------------------
-   4. Page container - the root element of every page gets
-   class="app-page"
-   --------------------------------------------------------------------- */
 
 .app-page {
     width: 100%;
@@ -207,24 +174,22 @@ a, .btn-link {
     font-family: "Segoe UI", sans-serif;
 }
 
-    .app-page :is(h1, h2, h3, h4, h5, h6) {
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        color: var(--app-heading);
-    }
+.app-page :is(h1, h2, h3, h4, h5, h6) {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--app-heading);
+}
 
-    .app-page .rz-text {
-        color: var(--app-muted);
-    }
+.app-page .rz-text {
+    color: var(--app-muted);
+}
 
-    .app-page :is(.rz-text-h1, .rz-text-h2, .rz-text-h3, .rz-text-h4, .rz-text-h5, .rz-text-h6) {
-        color: var(--app-heading);
-        font-weight: 700;
-    }
+.app-page :is(.rz-text-h1, .rz-text-h2, .rz-text-h3, .rz-text-h4, .rz-text-h5, .rz-text-h6) {
+    color: var(--app-heading);
+    font-weight: 700;
+}
 
-/* Full-bleed variant: no frame/padding, fills the whole content area.
-   Available to ANY page that needs to span the full screen (e.g. the
-   calendar), not just the one currently using it. */
+
 .content:has(.app-page--full) {
     padding: 0 !important;
 }
@@ -239,9 +204,6 @@ a, .btn-link {
     background: transparent;
 }
 
-/* ---------------------------------------------------------------------
-   5. Cards
-   --------------------------------------------------------------------- */
 
 .app-page .rz-card {
     background-color: var(--app-card-bg);
@@ -252,15 +214,10 @@ a, .btn-link {
     padding: var(--app-card-pad);
 }
 
-    .app-page .rz-card:hover {
-        box-shadow: var(--app-card-shadow-hover);
-    }
+.app-page .rz-card:hover {
+    box-shadow: var(--app-card-shadow-hover);
+}
 
-/* ---------------------------------------------------------------------
-   6. Buttons
-   NOT scoped to .app-page - dialogs render outside of it and still
-   need these.
-   --------------------------------------------------------------------- */
 
 .rz-button {
     border-radius: var(--app-radius-control);
@@ -268,27 +225,22 @@ a, .btn-link {
     padding: var(--app-btn-pad-y) var(--app-btn-pad-x);
 }
 
-    .rz-button.rz-primary {
-        background-color: var(--app-primary);
-        border-color: var(--app-primary);
-        color: var(--app-on-primary);
-    }
+.rz-button.rz-primary {
+    background-color: var(--app-primary);
+    border-color: var(--app-primary);
+    color: var(--app-on-primary);
+}
 
-        .rz-button.rz-primary:hover {
-            background-color: var(--app-primary-hover);
-            border-color: var(--app-primary-hover);
-        }
+.rz-button.rz-primary:hover {
+    background-color: var(--app-primary-hover);
+    border-color: var(--app-primary-hover);
+}
 
-    .rz-button.rz-danger {
-        background-color: var(--app-danger);
-        border-color: var(--app-danger);
-    }
+.rz-button.rz-danger {
+    background-color: var(--app-danger);
+    border-color: var(--app-danger);
+}
 
-/* ---------------------------------------------------------------------
-   7. Input fields (textbox, number, dropdown, date)
-   Also not scoped to .app-page, for the same reason as buttons: the
-   Add/Edit TimeEntry dialogs rely on these too.
-   --------------------------------------------------------------------- */
 
 :is(.rz-textbox, .rz-textarea, .rz-numeric, .rz-dropdown, .rz-datepicker) {
     border-radius: var(--app-radius-control);
@@ -320,55 +272,46 @@ label, .rz-label {
     color: var(--app-text);
 }
 
-/* Popup calendar used by date pickers everywhere (not the scheduler) */
+
 .rz-calendar {
     background-color: var(--app-card-bg);
     color: var(--app-text);
     border: 1px solid var(--app-card-border);
     border-radius: var(--app-radius-grid);
 }
-/* ---------------------------------------------------------------------
-   7b. DatePicker trigger icon fix
-   The trigger icon is absolutely positioned over the input's right
-   edge. Long formatted values (e.g. "11.11.2026 18:22:08") can push
-   right up against the icon, and the wrapper's border-radius/overflow
-   then clips it. Reserve space in the input and pin the icon with a
-   safe inset instead of right: 0.
-   --------------------------------------------------------------------- */
+
 
 .rz-datepicker {
     position: relative;
-    overflow: visible; /* never clip the trigger icon */
-    min-width: 14rem; /* enough room for "dd.MM.yyyy HH:mm:ss" + icon */
+    overflow: visible;
+    min-width: 14rem;
 }
 
-    .rz-datepicker input.rz-inputtext {
-        box-sizing: border-box;
-        width: 100%;
-        padding-right: 2.25rem; /* reserve space so text never runs under the icon */
-    }
+.rz-datepicker input.rz-inputtext {
+    box-sizing: border-box;
+    width: 100%;
+    padding-right: 2.25rem;
+}
 
 .rz-datepicker-trigger {
     position: absolute;
     top: 50%;
-    right: 0.4rem; /* small inset instead of flush right: 0 */
+    right: 0.4rem;
     transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
-    .rz-datepicker-trigger .rz-button {
-        width: auto;
-        height: auto;
-        padding: 0;
-        background: transparent;
-        border: none;
-        box-shadow: none;
-    }
-/* ---------------------------------------------------------------------
-   8. Tables (RadzenDataGrid)
-   --------------------------------------------------------------------- */
+.rz-datepicker-trigger .rz-button {
+    width: auto;
+    height: auto;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
 
 .app-page .rz-data-grid {
     background-color: var(--app-grid-bg);
@@ -378,37 +321,29 @@ label, .rz-label {
     max-width: 100%;
 }
 
-    .app-page .rz-data-grid .rz-grid-table thead th {
-        background-color: var(--app-grid-head-bg);
-        color: var(--app-muted);
-        font-weight: 600;
-        padding: var(--app-cell-pad-y) var(--app-cell-pad-x);
-        border-bottom: 1px solid var(--app-border);
-    }
+.app-page .rz-data-grid .rz-grid-table thead th {
+    background-color: var(--app-grid-head-bg);
+    color: var(--app-muted);
+    font-weight: 600;
+    padding: var(--app-cell-pad-y) var(--app-cell-pad-x);
+    border-bottom: 1px solid var(--app-border);
+}
 
-    .app-page .rz-data-grid .rz-grid-table tbody td {
-        background-color: var(--app-grid-bg);
-        color: var(--app-text);
-        padding: var(--app-cell-pad-y) var(--app-cell-pad-x);
-        border-bottom: 1px solid var(--app-grid-row-border);
-    }
+.app-page .rz-data-grid .rz-grid-table tbody td {
+    background-color: var(--app-grid-bg);
+    color: var(--app-text);
+    padding: var(--app-cell-pad-y) var(--app-cell-pad-x);
+    border-bottom: 1px solid var(--app-grid-row-border);
+}
 
-    .app-page .rz-data-grid .rz-grid-table tbody tr:nth-child(even) td {
-        background-color: var(--app-grid-stripe);
-    }
+.app-page .rz-data-grid .rz-grid-table tbody tr:nth-child(even) td {
+    background-color: var(--app-grid-stripe);
+}
 
-    .app-page .rz-data-grid .rz-grid-table tbody tr:hover td {
-        background-color: var(--app-grid-hover);
-    }
+.app-page .rz-data-grid .rz-grid-table tbody tr:hover td {
+    background-color: var(--app-grid-hover);
+}
 
-/* ---------------------------------------------------------------------
-   9. Dialogs and dropdown lists
-   RadzenDialogService renders these OUTSIDE of .app-page, so all dialog
-   styling must be global/unscoped. This is also what fixes the previous
-   UI bugs in the Add/Edit TimeEntry dialogs: page-specific rules (e.g.
-   the calendar's full-bleed/height rules) no longer exist in this file
-   and can therefore never collide with the dialog layout.
-   --------------------------------------------------------------------- */
 
 .rz-dialog {
     background-color: var(--app-card-bg);
@@ -431,9 +366,7 @@ label, .rz-label {
     color: var(--app-text);
 }
 
-/* If a dialog's root element also uses class="app-page" (e.g. a page
-   reused as a dialog), the page rules (full window height, gradient,
-   outer padding) must not apply inside the dialog. */
+
 .rz-dialog .app-page {
     min-height: 0;
     height: auto;
@@ -448,23 +381,18 @@ label, .rz-label {
     color: var(--app-text);
     border-color: var(--app-border);
 }
-/* ---------------------------------------------------------------------
-   9b. Alerts and notifications (RadzenAlert / RadzenNotification)
-   Used for inline validation errors inside dialogs and toast-style
-   error messages from Calendar.razor.cs. Not scoped to .app-page since
-   alerts render inside dialogs too.
-   --------------------------------------------------------------------- */
+
 
 .rz-alert {
     border-radius: var(--app-radius-control);
     border: 1px solid var(--app-card-border);
 }
 
-    .rz-alert.rz-alert-danger {
-        background-color: rgba(247, 118, 142, 0.12);
-        color: var(--tn-red);
-        border-color: var(--tn-red);
-    }
+.rz-alert.rz-alert-danger {
+    background-color: rgba(247, 118, 142, 0.12);
+    color: var(--tn-red);
+    border-color: var(--tn-red);
+}
 
 .rz-notification {
     background-color: var(--app-card-bg);
@@ -474,21 +402,19 @@ label, .rz-label {
     box-shadow: var(--app-card-shadow-hover);
 }
 
-    .rz-notification.rz-notification-danger {
-        border-color: var(--tn-red);
-    }
+.rz-notification.rz-notification-danger {
+    border-color: var(--tn-red);
+}
 
-    .rz-notification.rz-notification-success {
-        border-color: var(--tn-green);
-    }
+.rz-notification.rz-notification-success {
+    border-color: var(--tn-green);
+}
 
 .rz-notification-message .rz-notification-title {
     color: var(--app-heading);
     font-weight: 700;
 }
-/* ---------------------------------------------------------------------
-   10. Very small screens
-   --------------------------------------------------------------------- */
+
 
 @media (max-width: 480px) {
     .app-page {
@@ -496,24 +422,6 @@ label, .rz-label {
     }
 }
 
-/* =====================================================================
-   Work-week toggle for the Calendar page's RadzenScheduler week view.
-   Intentionally placed in the GLOBAL stylesheet (not a .razor.css
-   isolated file) because Blazor's component-scope attribute is not
-   reliably propagated onto markup rendered deep inside third-party
-   components like RadzenScheduler - plain, unscoped CSS avoids that
-   problem entirely.
-
-   .wd-hide-N is added to the RadzenScheduler root element (via
-   SchedulerCssClass in Calendar.razor.cs) only while Week view + the
-   "Work week only" setting are both active, so these rules never
-   affect Month view.
-
-   Header row (.rz-view-header) has an extra leading "hour label"
-   column, so day N is header child (N+1). The day-content container
-   (.rz-week-view-content) has no such extra column, so day N is
-   content child N - this is why the two nth-child indices differ by 1.
-   ===================================================================== */
 
 .wd-hide-2 .rz-view-header > *:nth-child(2),
 .wd-hide-2 .rz-week-view-content > *:nth-child(1) {

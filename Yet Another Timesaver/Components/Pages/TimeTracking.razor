@@ -1,4 +1,4 @@
-@page "/zeiterfassung"
+@page "/time-tracking"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 
 @using Yet_Another_Timesaver.Backend
@@ -6,113 +6,110 @@
 @using Radzen.Blazor
 @rendermode InteractiveServer
 
-<PageTitle>Zeiterfassung</PageTitle>
+<PageTitle>Time Tracking</PageTitle>
 
 <div class="app-page">
 
-    @* Seitenüberschrift *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <RadzenText Text="Zeiterfassung"
-                        TextStyle="TextStyle.H4" />
+            <RadzenText Text="Time Tracking"
+                        TextStyle="TextStyle.H4"/>
 
-            <RadzenText Text="Behalte deine Arbeitszeit im Überblick."
-                        TextStyle="TextStyle.Body2" />
+            <RadzenText Text="Keep your working hours in view."
+                        TextStyle="TextStyle.Body2"/>
         </div>
 
-        <RadzenButton Text="Aktualisieren"
+        <RadzenButton Text="Refresh"
                       Icon="refresh"
                       ButtonStyle="ButtonStyle.Light"
-                      Click="@RefreshData" />
+                      Click="@RefreshData"/>
     </div>
 
 
-    @* Übersichtskarten *@
     <RadzenRow Gap="16px">
 
         <RadzenColumn Size="12" SizeMD="4">
             <RadzenCard>
-                <RadzenText Text="Heute"
-                            TextStyle="TextStyle.Subtitle2" />
+                <RadzenText Text="Today"
+                            TextStyle="TextStyle.Subtitle2"/>
 
                 <RadzenText Text="@TodayHours"
-                            TextStyle="TextStyle.H4" />
+                            TextStyle="TextStyle.H4"/>
 
-                <RadzenText Text="Bisher erfasste Arbeitszeit"
-                            TextStyle="TextStyle.Caption" />
+                <RadzenText Text="Hours recorded today"
+                            TextStyle="TextStyle.Caption"/>
             </RadzenCard>
         </RadzenColumn>
 
         <RadzenColumn Size="12" SizeMD="4">
             <RadzenCard>
-                <RadzenText Text="Diese Woche"
-                            TextStyle="TextStyle.Subtitle2" />
+                <RadzenText Text="This week"
+                            TextStyle="TextStyle.Subtitle2"/>
 
                 <RadzenText Text="@WeekHours"
-                            TextStyle="TextStyle.H4" />
+                            TextStyle="TextStyle.H4"/>
 
-                <RadzenText Text="Gesamte Wochenarbeitszeit"
-                            TextStyle="TextStyle.Caption" />
+                <RadzenText Text="Total hours this week"
+                            TextStyle="TextStyle.Caption"/>
             </RadzenCard>
         </RadzenColumn>
 
         <RadzenColumn Size="12" SizeMD="4">
             <RadzenCard>
-                <RadzenText Text="Aktueller Status"
-                            TextStyle="TextStyle.Subtitle2" />
+                <RadzenText Text="Current status"
+                            TextStyle="TextStyle.Subtitle2"/>
 
                 <RadzenText Text="@WorkStatus"
-                            TextStyle="TextStyle.H4" />
+                            TextStyle="TextStyle.H4"/>
 
                 <RadzenText Text="@StatusDescription"
-                            TextStyle="TextStyle.Caption" />
+                            TextStyle="TextStyle.Caption"/>
             </RadzenCard>
         </RadzenColumn>
 
     </RadzenRow>
 
 
-    @* Arbeitszeit starten und beenden *@
     <RadzenCard class="mt-4">
 
-        <RadzenText Text="Arbeitszeiterfassung"
-                    TextStyle="TextStyle.H5" />
+        <RadzenText Text="Work session"
+                    TextStyle="TextStyle.H5"/>
 
         <RadzenText Text="@CurrentDate"
-                    TextStyle="TextStyle.Body2" />
+                    TextStyle="TextStyle.Body2"/>
 
         <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
 
             <div>
-                <RadzenText Text="Arbeitsbeginn"
-                            TextStyle="TextStyle.Caption" />
+                <RadzenText Text="Start time"
+                            TextStyle="TextStyle.Caption"/>
 
                 <RadzenText Text="@StartTime"
-                            TextStyle="TextStyle.H5" />
+                            TextStyle="TextStyle.H5"/>
             </div>
 
             <div>
-                <RadzenText Text="Arbeitsende"
-                            TextStyle="TextStyle.Caption" />
+                <RadzenText Text="End time"
+                            TextStyle="TextStyle.Caption"/>
 
                 <RadzenText Text="@EndTime"
-                            TextStyle="TextStyle.H5" />
+                            TextStyle="TextStyle.H5"/>
             </div>
 
             <div class="ms-md-auto">
                 @if (!IsWorking)
                 {
-                    <RadzenButton Text="Einstempeln"
+                    <RadzenButton Text="Start work"
                                   Icon="play_arrow"
                                   ButtonStyle="ButtonStyle.Primary"
-                                  Click="@StartWork" />
+                                  Click="@StartWork"/>
                 }
                 else
                 {
-                    <RadzenButton Text="Ausstempeln"
+                    <RadzenButton Text="End work"
                                   Icon="stop"
                                   ButtonStyle="ButtonStyle.Danger"
-                                  Click="@StopWork" />
+                                  Click="@StopWork"/>
                 }
             </div>
 
@@ -121,24 +118,23 @@
     </RadzenCard>
 
 
-    @* Zeiteinträge *@
     <RadzenCard class="mt-4">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <RadzenText Text="Meine Zeiteinträge"
-                        TextStyle="TextStyle.H5" />
+            <RadzenText Text="My time entries"
+                        TextStyle="TextStyle.H5"/>
 
             <div class="d-flex align-items-center gap-2">
                 <RadzenDatePicker @bind-Value="SelectedDate"
                                   DateFormat="dd.MM.yyyy"
-                                  Placeholder="Datum auswählen" />
+                                  Placeholder="Select date"/>
 
                 <RadzenButton Icon="close"
                               ButtonStyle="ButtonStyle.Light"
                               Variant="Variant.Flat"
                               Size="ButtonSize.Small"
                               Click="@(() => SelectedDate = null)"
-                              title="Alle Einträge anzeigen" />
+                              title="Show all entries"/>
             </div>
         </div>
 
@@ -147,31 +143,31 @@
                         AllowPaging="true"
                         PageSize="5"
                         AllowSorting="true"
-                        EmptyText="Keine Zeiteinträge vorhanden.">
+                        EmptyText="No time entries found.">
 
             <Columns>
 
                 <RadzenDataGridColumn TItem="TimeEntry"
                                       Property="StartTime"
-                                      Title="Datum"
-                                      FormatString="{0:dd.MM.yyyy}" />
+                                      Title="Date"
+                                      FormatString="{0:dd.MM.yyyy}"/>
 
                 <RadzenDataGridColumn TItem="TimeEntry"
                                       Property="StartTime"
-                                      Title="Beginn"
-                                      FormatString="{0:HH:mm}" />
+                                      Title="Start"
+                                      FormatString="{0:HH:mm}"/>
 
                 <RadzenDataGridColumn TItem="TimeEntry"
                                       Property="EndTime"
-                                      Title="Ende"
-                                      FormatString="{0:HH:mm}" />
+                                      Title="End"
+                                      FormatString="{0:HH:mm}"/>
 
                 <RadzenDataGridColumn TItem="TimeEntry"
                                       Property="Description"
-                                      Title="Beschreibung" />
+                                      Title="Description"/>
 
                 <RadzenDataGridColumn TItem="TimeEntry"
-                                      Title="Aktionen"
+                                      Title="Actions"
                                       Sortable="false"
                                       Filterable="false">
 
@@ -180,7 +176,7 @@
                                       ButtonStyle="ButtonStyle.Danger"
                                       Variant="Variant.Text"
                                       Size="ButtonSize.Small"
-                                      Click="@(() => DeleteEntry(entry))" />
+                                      Click="@(() => DeleteEntry(entry))"/>
                     </Template>
 
                 </RadzenDataGridColumn>

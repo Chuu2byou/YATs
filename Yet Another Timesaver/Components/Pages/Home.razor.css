@@ -1,5 +1,4 @@
 
-/* Homepage-Hintergrund */
 .home-background {
     position: relative;
     isolation: isolate;
@@ -20,48 +19,46 @@
     color: #c0caf5;
 }
 
-/* Raster */
+
 .background-grid {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
 
-    background-image:
-        linear-gradient(
-            rgba(122, 162, 247, 0.045) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(122, 162, 247, 0.045) 1px,
-            transparent 1px
-        );
+    background-image: linear-gradient(
+        rgba(122, 162, 247, 0.045) 1px,
+        transparent 1px
+    ),
+    linear-gradient(
+        90deg,
+        rgba(122, 162, 247, 0.045) 1px,
+        transparent 1px
+    );
 
     background-size: 100px 100px;
 }
 
-/* Lichtakzente */
+
 .background-glow {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
 
-    background:
-        radial-gradient(
-            ellipse at 75% 40%,
-            rgba(187, 154, 247, 0.18),
-            transparent 45%
-        ),
-        radial-gradient(
-            ellipse at 20% 80%,
-            rgba(122, 162, 247, 0.12),
-            transparent 45%
-        );
+    background: radial-gradient(
+        ellipse at 75% 40%,
+        rgba(187, 154, 247, 0.18),
+        transparent 45%
+    ),
+    radial-gradient(
+        ellipse at 20% 80%,
+        rgba(122, 162, 247, 0.12),
+        transparent 45%
+    );
 }
 
-/* SVG-Grafik */
+
 .background-art {
     position: absolute;
 
@@ -78,7 +75,7 @@
     opacity: 0.9;
 }
 
-/* Vorhandene Texte */
+
 .home-content {
     position: relative;
     z-index: 2;
@@ -94,7 +91,7 @@
     color: #a9b1d6;
 }
 
-/* Desktop: Ausgleich der Layout-Abstände */
+
 @media (min-width: 641px) {
     .home-background {
         width: calc(100% + 3.5rem);
@@ -107,7 +104,7 @@
     }
 }
 
-/* Smartphone und kleinere Fenster */
+
 @media (max-width: 640px) {
     .background-art {
         width: 120%;

@@ -2,14 +2,19 @@
 @inject IJSRuntime JSRuntime
 <RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" @attributes=@Attributes>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                     JustifyContent="JustifyContent.SpaceBetween">
             <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">Console log</RadzenText>
-            <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" />
+            <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat"
+                          Size="ButtonSize.Small"/>
         </RadzenStack>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="0" ID="event-console" class="rz-pt-1" Style=" min-height: 2rem; max-height: 12rem; overflow: auto;">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0" ID="event-console" class="rz-pt-1"
+                     Style=" min-height: 2rem; max-height: 12rem; overflow: auto;">
             @foreach (var message in messages)
             {
-                <RadzenAlert ShowIcon="false" Variant="Variant.Flat" AlertStyle="message.AlertStyle" Size="AlertSize.ExtraSmall" Shade="Shade.Lighter" AllowClose="false" Style="font-size: 0.75rem">
+                <RadzenAlert ShowIcon="false" Variant="Variant.Flat" AlertStyle="message.AlertStyle"
+                             Size="AlertSize.ExtraSmall" Shade="Shade.Lighter" AllowClose="false"
+                             Style="font-size: 0.75rem">
                     <span Style="opacity: 0.6;">@message.Date.ToString("HH:mm:ss.ff")</span> @message.Text
                 </RadzenAlert>
             }
@@ -18,9 +23,9 @@
 </RadzenCard>
 
 
-@*I don't know what black Magic is fueling this Madness, but for the love of God,
-DO NOT MOVE THIS CODE SECTION TO IT'S OWN FILE*@
 @code {
+
+    /// <summary>Represents a message displayed in the event console.</summary>
     class Message
     {
         public DateTime Date { get; set; }
@@ -30,6 +35,7 @@ DO NOT MOVE THIS CODE SECTION TO IT'S OWN FILE*@
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
+
     IList<Message> messages = new List<Message>();
 
     void OnClearClick()
@@ -55,4 +61,5 @@ DO NOT MOVE THIS CODE SECTION TO IT'S OWN FILE*@
     {
         Log(JsonSerializer.Serialize(value));
     }
+
 }

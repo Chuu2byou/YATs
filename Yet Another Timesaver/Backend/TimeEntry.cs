@@ -1,5 +1,6 @@
 namespace Yet_Another_Timesaver.Backend;
 
+/// <summary>Represents a recorded time interval.</summary>
 public class TimeEntry
 {
     public int Id { get; set; }
