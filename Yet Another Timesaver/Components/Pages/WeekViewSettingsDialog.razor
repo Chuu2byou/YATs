@@ -1,0 +1,20 @@
+@inject DialogService DialogService
+@using Yet_Another_Timesaver.Backend
+@rendermode InteractiveServer
+
+<RadzenStack Gap="1rem" Style="min-width: 20rem;">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenLabel Text="Week starts on" />
+        <RadzenDropDown TValue="DayOfWeek" @bind-Value="@model.StartDay" Data="@AvailableStartDays" Style="width: 10rem;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenLabel Text="Work week only (hide Sat/Sun)" />
+        <RadzenSwitch @bind-Value="@model.WorkWeekOnly" Change="@OnWorkWeekOnlyChanged" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Click=@OnCancelClick />
+        <RadzenButton Text="Save" ButtonStyle="ButtonStyle.Primary" Click=@OnSaveClick />
+    </RadzenStack>
+</RadzenStack>

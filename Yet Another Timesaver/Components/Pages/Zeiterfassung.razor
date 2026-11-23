@@ -128,12 +128,21 @@
             <RadzenText Text="Meine Zeiteinträge"
                         TextStyle="TextStyle.H5" />
 
-            <RadzenDatePicker @bind-Value="SelectedDate"
-                              DateFormat="dd.MM.yyyy"
-                              Placeholder="Datum auswählen" />
+            <div class="d-flex align-items-center gap-2">
+                <RadzenDatePicker @bind-Value="SelectedDate"
+                                  DateFormat="dd.MM.yyyy"
+                                  Placeholder="Datum auswählen" />
+
+                <RadzenButton Icon="close"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Small"
+                              Click="@(() => SelectedDate = null)"
+                              title="Alle Einträge anzeigen" />
+            </div>
         </div>
 
-        <RadzenDataGrid Data="@Entries"
+        <RadzenDataGrid Data="@FilteredEntries"
                         TItem="TimeEntry"
                         AllowPaging="true"
                         PageSize="5"
