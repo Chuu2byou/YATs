@@ -10,7 +10,6 @@ YATs ist eine webbasierte Zeiterfassung. Zeiteinträge lassen sich über eine Fo
 - **Wochenansicht-Einstellungen**: Wochenstart (Wochentag) wählen und optional nur die Arbeitswoche anzeigen. Die Einstellungen werden im Browser gespeichert.
 - **Zeitzonen**: Einträge werden in der Datenbank in UTC gespeichert und in der Oberfläche in der Zeitzone `Europe/Berlin` angezeigt.
 - **Validierung**: Die Endzeit muss nach der Startzeit liegen.
-- **Mehrsprachigkeit**: Englisch (Standard) und Deutsch, Umschaltung über `/culture/set`.
 
 ## Technologie
 
