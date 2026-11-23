@@ -3,13 +3,12 @@ using Yet_Another_Timesaver.Backend;
 
 namespace Yet_Another_Timesaver.Components.Pages;
 
+/// <summary>Provides the time entry creation dialog.</summary>
 public partial class AddTimeEntryPage : ComponentBase
 {
-    [Parameter]
-    public DateTime Start { get; set; }
+    [Parameter] public DateTime Start { get; set; }
 
-    [Parameter]
-    public DateTime End { get; set; }
+    [Parameter] public DateTime End { get; set; }
 
     private readonly TimeEntry model = new();
     private string? errorMessage;

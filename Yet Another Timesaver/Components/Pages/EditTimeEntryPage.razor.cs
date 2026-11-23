@@ -4,10 +4,10 @@ using Yet_Another_Timesaver.Backend;
 
 namespace Yet_Another_Timesaver.Components.Pages;
 
+/// <summary>Provides the time entry edit and delete dialog.</summary>
 public partial class EditTimeEntryPage : ComponentBase
 {
-    [Parameter]
-    public TimeEntry TimeEntry { get; set; } = default!;
+    [Parameter] public TimeEntry TimeEntry { get; set; } = default!;
 
     private TimeEntry model = new();
     private string? errorMessage;

@@ -5,7 +5,7 @@ YATs ist eine webbasierte Zeiterfassung. Zeiteinträge lassen sich über eine Fo
 ## Funktionen
 
 - **Login / Logout** mit Cookie-Authentifizierung (Sitzung 8 Stunden, gleitende Verlängerung). Alle Seiten außer dem Login sind geschützt.
-- **Zeiterfassung** (`/zeiterfassung`): Zeiteinträge mit Titel, Start- und optionaler Endzeit anlegen.
+- **Time Tracking** (`/time-tracking`): Zeiteinträge mit Titel, Start- und optionaler Endzeit anlegen.
 - **Kalender** (`/calendar`): Wochen- und Monatsansicht (Radzen Scheduler) mit Dialogen zum Anlegen, Bearbeiten und Löschen von Einträgen.
 - **Wochenansicht-Einstellungen**: Wochenstart (Wochentag) wählen und optional nur die Arbeitswoche anzeigen. Die Einstellungen werden im Browser gespeichert.
 - **Zeitzonen**: Einträge werden in der Datenbank in UTC gespeichert und in der Oberfläche in der Zeitzone `Europe/Berlin` angezeigt.
@@ -30,7 +30,7 @@ Yet Another Timesaver/
 ├── Backend/          # Datenmodell (TimeEntry), AppDbContext, TimeService, Migrationen, Ressourcen (de/en)
 ├── Components/
 │   ├── Layout/       # MainLayout, Navigationsmenü, Reconnect-Dialog
-│   └── Pages/        # Home, Login, Calendar, Zeiterfassung, Add-/Edit-Dialoge, Einstellungen
+│   └── Pages/        # Home, Login, Calendar, TimeTracking, Add-/Edit-Dialoge, Einstellungen
 ├── Properties/       # launchSettings.json
 ├── wwwroot/          # Statische Dateien (CSS, JS, Icons, Bootstrap)
 ├── Program.cs        # Konfiguration, Authentifizierung, Lokalisierung, Endpunkte
@@ -53,7 +53,7 @@ Yet Another Timesaver/
 2. Lokale Konfiguration anlegen: `Yet Another Timesaver/appsettings.Development.example.json` nach `appsettings.Development.json` kopieren und den Connection String anpassen:
    ```json
    "ConnectionStrings": {
-     "DefaultConnection": "Host=<HOST>;Port=5432;Database=yats_<NAME>;Username=<NAME>;Password=<PASSWORT>;SSL Mode=Require"
+      "DefaultConnection": "Host=<HOST>;Port=5432;Database=yats_<NAME>;Username=<NAME>;Password=<PASSWORD>;SSL Mode=Require"
    }
    ```
    Die Datei `appsettings.Development.json` ist in `.gitignore` eingetragen und bleibt lokal.

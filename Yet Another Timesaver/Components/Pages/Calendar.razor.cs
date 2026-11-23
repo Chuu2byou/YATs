@@ -8,13 +8,12 @@ using Yet_Another_Timesaver.Backend;
 
 namespace Yet_Another_Timesaver.Components.Pages;
 
+/// <summary>Displays and manages time entries in a calendar.</summary>
 public partial class Calendar : ComponentBase
 {
-    [Inject]
-    private TimeService TimeService { get; set; } = default!;
+    [Inject] private TimeService TimeService { get; set; } = default!;
 
-    [Inject]
-    private IJSRuntime JSRuntime { get; set; } = default!;
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     private RadzenScheduler<TimeEntry> scheduler = default!;
     private RadzenDayView? dayView;
@@ -121,7 +120,6 @@ public partial class Calendar : ComponentBase
         }
         catch (JSException)
         {
-            // localStorage unavailable - fall back to defaults
         }
 
         return WeekViewSettings.Default;
@@ -137,19 +135,22 @@ public partial class Calendar : ComponentBase
     {
         if (args.View?.Text == "Month" && args.Start.Date == TimeService.Today)
         {
-            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+            args.Attributes["style"] =
+                "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
         }
 
         if ((args.View?.Text == "Week" || args.View?.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
         {
-            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+            args.Attributes["style"] =
+                "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
         }
     }
 
     private async Task CreateTimeBooking()
     {
         var timeBooking = await DialogService.OpenAsync<AddTimeEntryPage>("Add TimeEntry",
-            new Dictionary<string, object?> { { "Start", TimeService.Now }, { "End", TimeService.Now.AddMinutes(30) } });
+            new Dictionary<string, object?>
+                { { "Start", TimeService.Now }, { "End", TimeService.Now.AddMinutes(30) } });
 
         if (timeBooking is TimeEntry entry)
         {
@@ -202,6 +203,7 @@ public partial class Calendar : ComponentBase
                     selectedEntry.EndTime = updatedEntry.EndTime;
                     selectedEntry.Description = updatedEntry.Description;
                 }
+
                 break;
         }
 

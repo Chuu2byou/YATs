@@ -27,39 +27,39 @@
         @if (string.Equals(Error, "1", StringComparison.Ordinal))
         {
             <RadzenAlert AlertStyle="AlertStyle.Danger">
-                Benutzername oder Passwort ist falsch.
+                The username or password is incorrect.
             </RadzenAlert>
         }
 
         <form method="post" action="/account/login">
 
-            <AntiforgeryToken />
+            <AntiforgeryToken/>
 
             <RadzenStack Gap="1rem">
 
-                <RadzenFormField Text="Benutzername" Variant="Variant.Outlined">
+                <RadzenFormField Text="Username" Variant="Variant.Outlined">
                     <ChildContent>
                         <RadzenTextBox Name="username"
                                        @bind-Value="userName"
                                        AutoCompleteType="AutoCompleteType.Username"
-                                       Style="width: 100%;" />
+                                       Style="width: 100%;"/>
                     </ChildContent>
                 </RadzenFormField>
 
-                <RadzenFormField Text="Passwort" Variant="Variant.Outlined">
+                <RadzenFormField Text="Password" Variant="Variant.Outlined">
                     <ChildContent>
                         <RadzenPassword Name="password"
                                         @bind-Value="password"
                                         AutoCompleteType="AutoCompleteType.CurrentPassword"
-                                        Style="width: 100%;" />
+                                        Style="width: 100%;"/>
                     </ChildContent>
                 </RadzenFormField>
 
                 <RadzenButton ButtonType="ButtonType.Submit"
-                              Text="Anmelden"
+                              Text="Sign in"
                               Icon="login"
                               ButtonStyle="ButtonStyle.Primary"
-                              Style="width: 100%; background-color: #711c91;" />
+                              Style="width: 100%; background-color: #711c91;"/>
 
             </RadzenStack>
 
@@ -68,4 +68,3 @@
     </RadzenCard>
 
 </RadzenStack>
-

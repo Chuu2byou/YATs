@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using Yet_Another_Timesaver.Backend;
+
 namespace Yet_Another_Timesaver.Components.Pages;
 
-
-public partial class Zeiterfassung
+/// <summary>Displays and manages the time tracking dashboard.</summary>
+public partial class TimeTracking
 {
-    [Inject]
-    private TimeService TimeService { get; set; } = default!;
+    [Inject] private TimeService TimeService { get; set; } = default!;
 
     private TimeEntry? currentTimeBooking;
     private bool IsWorking = false;
@@ -30,12 +30,12 @@ public partial class Zeiterfassung
     }
 
     private string WorkStatus =>
-        IsWorking ? "Aktiv" : "Nicht aktiv";
+        IsWorking ? "Active" : "Inactive";
 
     private string StatusDescription =>
         IsWorking
-            ? "Deine Arbeitszeit läuft."
-            : "Noch keine aktive Buchung.";
+            ? "Your work session is in progress."
+            : "No active work session.";
 
     private string CurrentDate =>
         TimeService.Today.ToString("dddd, dd. MMMM yyyy");
@@ -43,9 +43,9 @@ public partial class Zeiterfassung
     private List<TimeEntry> Entries = new();
 
     private IEnumerable<TimeEntry> FilteredEntries =>
-    SelectedDate is null
-        ? Entries
-        : Entries.Where(entry => entry.StartTime.Date == SelectedDate.Value.Date);
+        SelectedDate is null
+            ? Entries
+            : Entries.Where(entry => entry.StartTime.Date == SelectedDate.Value.Date);
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,7 +60,7 @@ public partial class Zeiterfassung
     {
         var savedEntry = await TimeService.AddAsync(new TimeEntry
         {
-            Description = "Arbeitszeit",
+            Description = "Work time",
             StartTime = TimeService.Now
         });
         currentTimeBooking = ToLocal(savedEntry);
@@ -149,6 +149,6 @@ public partial class Zeiterfassung
         var duration = entries.Aggregate(
             TimeSpan.Zero,
             (total, entry) => total + ((entry.EndTime ?? TimeService.Now) - entry.StartTime));
-        return $"{(int)duration.TotalHours} Std. {duration.Minutes:00} Min.";
+        return $"{(int)duration.TotalHours} hrs {duration.Minutes:00} min.";
     }
 }

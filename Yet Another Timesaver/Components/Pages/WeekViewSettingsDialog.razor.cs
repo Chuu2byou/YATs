@@ -3,10 +3,10 @@ using Yet_Another_Timesaver.Backend;
 
 namespace Yet_Another_Timesaver.Components.Pages;
 
+/// <summary>Configures calendar week view preferences.</summary>
 public partial class WeekViewSettingsDialog : ComponentBase
 {
-    [Parameter]
-    public WeekViewSettings Settings { get; set; } = WeekViewSettings.Default;
+    [Parameter] public WeekViewSettings Settings { get; set; } = WeekViewSettings.Default;
 
     private WeekViewSettings model = new();
 
